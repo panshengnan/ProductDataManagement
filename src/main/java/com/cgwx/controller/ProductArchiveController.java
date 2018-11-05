@@ -89,7 +89,7 @@ public class ProductArchiveController {
 //    }
 
 
-    @RequestMapping(value = "/uploadThemeticProduct")
+    @RequestMapping(value = "/uploadThemeticProduct")//
     @CrossOrigin(methods = RequestMethod.POST)
     @ResponseBody
     public Result uploadThemeticProduct(@RequestParam(value = "file", required = true) MultipartFile file) throws Exception {
