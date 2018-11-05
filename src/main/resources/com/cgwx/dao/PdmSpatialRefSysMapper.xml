@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmSpatialRefSysMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmSpatialRefSys" >
+    <id column="srid" property="srid" jdbcType="INTEGER" />
+    <result column="auth_name" property="authName" jdbcType="VARCHAR" />
+    <result column="auth_srid" property="authSrid" jdbcType="INTEGER" />
+    <result column="srtext" property="srtext" jdbcType="VARCHAR" />
+    <result column="proj4text" property="proj4text" jdbcType="VARCHAR" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pdm_spatial_ref_sys
+    where srid = #{srid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmSpatialRefSys" >
+    insert into pdm_spatial_ref_sys (srid, auth_name, auth_srid, 
+      srtext, proj4text)
+    values (#{srid,jdbcType=INTEGER}, #{authName,jdbcType=VARCHAR}, #{authSrid,jdbcType=INTEGER}, 
+      #{srtext,jdbcType=VARCHAR}, #{proj4text,jdbcType=VARCHAR})
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.cgwx.data.entity.PdmSpatialRefSys" >
+    update pdm_spatial_ref_sys
+    set auth_name = #{authName,jdbcType=VARCHAR},
+      auth_srid = #{authSrid,jdbcType=INTEGER},
+      srtext = #{srtext,jdbcType=VARCHAR},
+      proj4text = #{proj4text,jdbcType=VARCHAR}
+    where srid = #{srid,jdbcType=INTEGER}
+  </update>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select srid, auth_name, auth_srid, srtext, proj4text
+    from pdm_spatial_ref_sys
+    where srid = #{srid,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select srid, auth_name, auth_srid, srtext, proj4text
+    from pdm_spatial_ref_sys
+  </select>
+</mapper>

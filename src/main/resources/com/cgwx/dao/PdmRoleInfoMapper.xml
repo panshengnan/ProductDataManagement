@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmRoleInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmRoleInfo" >
+    <result column="role_id" property="roleId" jdbcType="VARCHAR" />
+    <result column="role_description" property="roleDescription" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmRoleInfo" >
+    insert into pdm_role_info (role_id, role_description)
+    values (#{roleId,jdbcType=VARCHAR}, #{roleDescription,jdbcType=VARCHAR})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select role_id, role_description
+    from pdm_role_info
+  </select>
+</mapper>

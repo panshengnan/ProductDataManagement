@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmProductStoreLinkInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmProductStoreLinkInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="single_period_product_id" property="singlePeriodProductId" jdbcType="VARCHAR" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="store_link" property="storeLink" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmProductStoreLinkInfo" >
+    insert into pdm_product_store_link_info (product_id, single_period_product_id, 
+      file_name, store_link)
+    values (#{productId,jdbcType=VARCHAR}, #{singlePeriodProductId,jdbcType=VARCHAR}, 
+      #{fileName,jdbcType=VARCHAR}, #{storeLink,jdbcType=VARCHAR})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, single_period_product_id, file_name, store_link
+    from pdm_product_store_link_info
+  </select>
+</mapper>

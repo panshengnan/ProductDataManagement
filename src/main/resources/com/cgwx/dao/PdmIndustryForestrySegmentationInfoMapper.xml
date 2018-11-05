@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmIndustryForestrySegmentationInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmIndustryForestrySegmentationInfo" >
+    <result column="forestry_segmentation_code" property="forestrySegmentationCode" jdbcType="INTEGER" />
+    <result column="forestry_segmentation_description" property="forestrySegmentationDescription" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmIndustryForestrySegmentationInfo" >
+    insert into pdm_industry_forestry_segmentation_info (forestry_segmentation_code, forestry_segmentation_description
+      )
+    values (#{forestrySegmentationCode,jdbcType=INTEGER}, #{forestrySegmentationDescription,jdbcType=VARCHAR}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select forestry_segmentation_code, forestry_segmentation_description
+    from pdm_industry_forestry_segmentation_info
+  </select>
+</mapper>

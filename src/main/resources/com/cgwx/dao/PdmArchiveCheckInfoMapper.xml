@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmArchiveCheckInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmArchiveCheckInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="temporary_path" property="temporaryPath" jdbcType="VARCHAR" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="is_multi_period" property="isMultiPeriod" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmArchiveCheckInfo" >
+    insert into pdm_archive_check_info (product_id, status, temporary_path, 
+      file_name, is_multi_period)
+    values (#{productId,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{temporaryPath,jdbcType=VARCHAR}, 
+      #{fileName,jdbcType=VARCHAR}, #{isMultiPeriod,jdbcType=INTEGER})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, status, temporary_path, file_name, is_multi_period
+    from pdm_archive_check_info
+  </select>
+</mapper>

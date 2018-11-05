@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmSubdivisionProductInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmSubdivisionProductInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="subdivision_product_name" property="subdivisionProductName" jdbcType="VARCHAR" />
+    <result column="image_geo" property="imageGeo" jdbcType="OTHER" />
+    <result column="subdivision_product_directory" property="subdivisionProductDirectory" jdbcType="VARCHAR" />
+    <result column="number_of_tif" property="numberOfTif" jdbcType="INTEGER" />
+    <result column="industry" property="industry" jdbcType="VARCHAR" />
+    <result column="producer" property="producer" jdbcType="VARCHAR" />
+    <result column="client_name" property="clientName" jdbcType="VARCHAR" />
+    <result column="deliever_name" property="delieverName" jdbcType="VARCHAR" />
+    <result column="deliever_time" property="delieverTime" jdbcType="VARCHAR" />
+    <result column="resolution" property="resolution" jdbcType="NUMERIC" />
+    <result column="geographic_info" property="geographicInfo" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmSubdivisionProductInfo" >
+    insert into pdm_subdivision_product_info (product_id, subdivision_product_name, 
+      image_geo, subdivision_product_directory, number_of_tif, 
+      industry, producer, client_name, 
+      deliever_name, deliever_time, resolution, 
+      geographic_info)
+    values (#{productId,jdbcType=VARCHAR}, #{subdivisionProductName,jdbcType=VARCHAR}, 
+      #{imageGeo,jdbcType=OTHER}, #{subdivisionProductDirectory,jdbcType=VARCHAR}, #{numberOfTif,jdbcType=INTEGER}, 
+      #{industry,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, 
+      #{delieverName,jdbcType=VARCHAR}, #{delieverTime,jdbcType=VARCHAR}, #{resolution,jdbcType=NUMERIC}, 
+      #{geographicInfo,jdbcType=VARCHAR})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, subdivision_product_name, image_geo, subdivision_product_directory, 
+    number_of_tif, industry, producer, client_name, deliever_name, deliever_time, resolution, 
+    geographic_info
+    from pdm_subdivision_product_info
+  </select>
+</mapper>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmThemeticProductDetailIndustryInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmThemeticProductDetailIndustryInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="industry_level1" property="industryLevel1" jdbcType="INTEGER" />
+    <result column="industry_level2" property="industryLevel2" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmThemeticProductDetailIndustryInfo" >
+    insert into pdm_themetic_product_detail_industry_info (product_id, industry_level1, industry_level2
+      )
+    values (#{productId,jdbcType=VARCHAR}, #{industryLevel1,jdbcType=INTEGER}, #{industryLevel2,jdbcType=INTEGER}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, industry_level1, industry_level2
+    from pdm_themetic_product_detail_industry_info
+  </select>
+</mapper>

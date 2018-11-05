@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmIndustryAgricultureSegmentationInfoIdSeqMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmIndustryAgricultureSegmentationInfoIdSeq" >
+    <result column="sequence_name" property="sequenceName" jdbcType="VARCHAR" />
+    <result column="last_value" property="lastValue" jdbcType="BIGINT" />
+    <result column="start_value" property="startValue" jdbcType="BIGINT" />
+    <result column="increment_by" property="incrementBy" jdbcType="BIGINT" />
+    <result column="max_value" property="maxValue" jdbcType="BIGINT" />
+    <result column="min_value" property="minValue" jdbcType="BIGINT" />
+    <result column="cache_value" property="cacheValue" jdbcType="BIGINT" />
+    <result column="log_cnt" property="logCnt" jdbcType="BIGINT" />
+    <result column="is_cycled" property="isCycled" jdbcType="BIT" />
+    <result column="is_called" property="isCalled" jdbcType="BIT" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmIndustryAgricultureSegmentationInfoIdSeq" >
+    insert into pdm_industry_agriculture_segmentation_info_id_seq (sequence_name, last_value, start_value, 
+      increment_by, max_value, min_value, 
+      cache_value, log_cnt, is_cycled, 
+      is_called)
+    values (#{sequenceName,jdbcType=VARCHAR}, #{lastValue,jdbcType=BIGINT}, #{startValue,jdbcType=BIGINT}, 
+      #{incrementBy,jdbcType=BIGINT}, #{maxValue,jdbcType=BIGINT}, #{minValue,jdbcType=BIGINT}, 
+      #{cacheValue,jdbcType=BIGINT}, #{logCnt,jdbcType=BIGINT}, #{isCycled,jdbcType=BIT}, 
+      #{isCalled,jdbcType=BIT})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select sequence_name, last_value, start_value, increment_by, max_value, min_value, 
+    cache_value, log_cnt, is_cycled, is_called
+    from pdm_industry_agriculture_segmentation_info_id_seq
+  </select>
+</mapper>

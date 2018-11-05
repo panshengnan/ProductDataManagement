@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmPermissionInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmPermissionInfo" >
+    <result column="permission_id" property="permissionId" jdbcType="VARCHAR" />
+    <result column="permission_description" property="permissionDescription" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmPermissionInfo" >
+    insert into pdm_permission_info (permission_id, permission_description
+      )
+    values (#{permissionId,jdbcType=VARCHAR}, #{permissionDescription,jdbcType=VARCHAR}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select permission_id, permission_description
+    from pdm_permission_info
+  </select>
+</mapper>

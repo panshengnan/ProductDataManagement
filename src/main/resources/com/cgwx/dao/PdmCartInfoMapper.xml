@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmCartInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmCartInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="submitter" property="submitter" jdbcType="VARCHAR" />
+    <result column="submit_time" property="submitTime" jdbcType="TIMESTAMP" />
+    <result column="number_of_products" property="numberOfProducts" jdbcType="INTEGER" />
+    <result column="product_price" property="productPrice" jdbcType="NUMERIC" />
+    <result column="product_discount_price" property="productDiscountPrice" jdbcType="NUMERIC" />
+    <result column="product_discount" property="productDiscount" jdbcType="NUMERIC" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmCartInfo" >
+    insert into pdm_cart_info (product_id, submitter, submit_time, 
+      number_of_products, product_price, product_discount_price, 
+      product_discount)
+    values (#{productId,jdbcType=VARCHAR}, #{submitter,jdbcType=VARCHAR}, #{submitTime,jdbcType=TIMESTAMP}, 
+      #{numberOfProducts,jdbcType=INTEGER}, #{productPrice,jdbcType=NUMERIC}, #{productDiscountPrice,jdbcType=NUMERIC}, 
+      #{productDiscount,jdbcType=NUMERIC})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, submitter, submit_time, number_of_products, product_price, product_discount_price, 
+    product_discount
+    from pdm_cart_info
+  </select>
+</mapper>

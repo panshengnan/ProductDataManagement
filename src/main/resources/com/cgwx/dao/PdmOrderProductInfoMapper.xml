@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmOrderProductInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmOrderProductInfo" >
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="order_product" property="orderProduct" jdbcType="VARCHAR" />
+    <result column="product_price" property="productPrice" jdbcType="NUMERIC" />
+    <result column="product_discount_price" property="productDiscountPrice" jdbcType="NUMERIC" />
+    <result column="product_discount" property="productDiscount" jdbcType="NUMERIC" />
+    <result column="number_of_products" property="numberOfProducts" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmOrderProductInfo" >
+    insert into pdm_order_product_info (order_id, order_product, product_price, 
+      product_discount_price, product_discount, 
+      number_of_products)
+    values (#{orderId,jdbcType=VARCHAR}, #{orderProduct,jdbcType=VARCHAR}, #{productPrice,jdbcType=NUMERIC}, 
+      #{productDiscountPrice,jdbcType=NUMERIC}, #{productDiscount,jdbcType=NUMERIC}, 
+      #{numberOfProducts,jdbcType=INTEGER})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select order_id, order_product, product_price, product_discount_price, product_discount, 
+    number_of_products
+    from pdm_order_product_info
+  </select>
+</mapper>

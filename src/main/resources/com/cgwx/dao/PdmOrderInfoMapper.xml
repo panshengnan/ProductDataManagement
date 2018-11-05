@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmOrderInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmOrderInfo" >
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="order_price" property="orderPrice" jdbcType="NUMERIC" />
+    <result column="order_discount_price" property="orderDiscountPrice" jdbcType="NUMERIC" />
+    <result column="order_submitter" property="orderSubmitter" jdbcType="VARCHAR" />
+    <result column="submit_time" property="submitTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmOrderInfo" >
+    insert into pdm_order_info (order_id, order_status, order_price, 
+      order_discount_price, order_submitter, submit_time
+      )
+    values (#{orderId,jdbcType=VARCHAR}, #{orderStatus,jdbcType=INTEGER}, #{orderPrice,jdbcType=NUMERIC}, 
+      #{orderDiscountPrice,jdbcType=NUMERIC}, #{orderSubmitter,jdbcType=VARCHAR}, #{submitTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select order_id, order_status, order_price, order_discount_price, order_submitter, 
+    submit_time
+    from pdm_order_info
+  </select>
+</mapper>
