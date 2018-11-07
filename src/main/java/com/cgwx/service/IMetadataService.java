@@ -10,7 +10,8 @@ public interface IMetadataService {
     ThemeticProductDetail getThemeticProductDetail(String productId, List<String> singlePeriodProductIdList);
     OrthoProductDetail getOrthoProductDetail(String productId);
     InlayProductDetail getInlayProductDetail(String productId);
-    List<FileUrl> getFileListAndUrl(String path);
+    List<FileUrl> getFileListAndUrl(String productId,String singlePeriodProductId);
+    //List<FileUrl> getFileListAndUrl(String productId);
     SubdivisionProductDetail getSubdivisionProductDetail(String productId);
     ProductQueryListResult getProductList(ProductQueryCri cri);
     ThemeticProductListResult getThemeticProductList (ThemeticProductCri themeticProductCri);

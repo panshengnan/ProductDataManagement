@@ -22,6 +22,24 @@ public class ThemeticProductDetail {
     private String delieverName;
 
     private Date delieverTime;
+    private String analysisReportUrl;
+    private String allFileDownloadUrl;
+
+    public void setAnalysisReportUrl(String analysisReportUrl) {
+        this.analysisReportUrl = analysisReportUrl;
+    }
+
+    public void setAllFileDownloadUrl(String allFileDownloadUrl) {
+        this.allFileDownloadUrl = allFileDownloadUrl;
+    }
+
+    public String getAnalysisReportUrl() {
+        return analysisReportUrl;
+    }
+
+    public String getAllFileDownloadUrl() {
+        return allFileDownloadUrl;
+    }
 
     private List<SinglePeriodThemeticProductDetail> singlePeriodThemeticProductDetail;
 

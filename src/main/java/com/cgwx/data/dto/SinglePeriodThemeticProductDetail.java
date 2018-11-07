@@ -22,17 +22,18 @@ public class SinglePeriodThemeticProductDetail {
 
 
 
-    private String imagingTime;
+    private String centerImagingTime;
 
     private String produceTime;
 
 
 
-    private String analysisReportUrl;
+    //private String analysisReportUrl;
+    //private String allFileDownloadUrl;
 
     private String thumbnailUrl;
 
-    private String allFileDownloadUrl;
+
 
     private List<FileUrl> fileListAndUrl;
 
@@ -112,10 +113,10 @@ public class SinglePeriodThemeticProductDetail {
     }
 
 
-    public  String getAnalysisReportUrl(){return  analysisReportUrl;}
-    public void setAnalysisReportUrl(String analysisReportUrl){
-        this.analysisReportUrl =analysisReportUrl == null ? null : analysisReportUrl.trim();
-    }
+//    public  String getAnalysisReportUrl(){return  analysisReportUrl;}
+//    public void setAnalysisReportUrl(String analysisReportUrl){
+//        this.analysisReportUrl =analysisReportUrl == null ? null : analysisReportUrl.trim();
+//    }
     public  String getThumbnailUrl(){return  thumbnailUrl;}
     public void setThumbnailUrl(String thumbnailUrl){
         this.thumbnailUrl =thumbnailUrl == null ? null : thumbnailUrl.trim();
@@ -126,21 +127,21 @@ public class SinglePeriodThemeticProductDetail {
         this.fileListAndUrl =fileListAndUrl;
     }
 
-    public String getAllFileDownloadUrl() {
-        return allFileDownloadUrl;
+//    public String getAllFileDownloadUrl() {
+//        return allFileDownloadUrl;
+//    }
+//    public void setAllFileDownloadUrl(String allFileDownloadUrl){
+//        this.allFileDownloadUrl=allFileDownloadUrl;
+//    }
+
+
+
+    public String getCenterimagingTime() {
+        return centerImagingTime;
     }
-    public void setAllFileDownloadUrl(String allFileDownloadUrl){
-        this.allFileDownloadUrl=allFileDownloadUrl;
-    }
 
-
-
-    public String getImagingTime() {
-        return imagingTime;
-    }
-
-    public void setImagingTime(String imagingTime) {
-        this.imagingTime = imagingTime == null ? null : imagingTime.trim();
+    public void setCenterImagingTime(String imagingTime) {
+        this.centerImagingTime = imagingTime == null ? null : imagingTime.trim();
     }
 
     public String getProduceTime() {

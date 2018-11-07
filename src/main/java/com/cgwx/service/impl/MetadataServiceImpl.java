@@ -37,8 +37,8 @@ public class MetadataServiceImpl implements IMetadataService {
     @Autowired
     PdmProductTypeInfoMapper pdmProductTypeInfoMapper;
 
-
-
+    @Autowired
+    IProductDownloadServiceImpl iProductDownloadService;
 
     @Override
    //単期产品详情
@@ -58,12 +58,12 @@ public class MetadataServiceImpl implements IMetadataService {
 
         if(themeticProductDetailPart2.getImagingTime()==null)
         {
-            singlePeriodThemeticProductDetail.setImagingTime(null);
+            singlePeriodThemeticProductDetail.setCenterImagingTime(null);
         }
         else
         {
             String setImagingtime=timeFormat.format(themeticProductDetailPart2.getImagingTime());
-            singlePeriodThemeticProductDetail.setImagingTime(setImagingtime);
+            singlePeriodThemeticProductDetail.setCenterImagingTime(setImagingtime);
         }
 
         if(themeticProductDetailPart2.getProduceTime()==null)
@@ -80,42 +80,67 @@ public class MetadataServiceImpl implements IMetadataService {
 
         String path =themeticProductDetailPart1.getParentDirectory();
 
-        //获取分析报告路径
-        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-        singlePeriodThemeticProductDetail.setAnalysisReportUrl(path1);
+
+
 
         //获取文件列表和对应的URL
         String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\1";
-        List<FileUrl> themeticUrlList = getFileListAndUrl(path3);
+        List<FileUrl> themeticUrlList = getFileListAndUrl(productId,singlePeriodProductId);
         singlePeriodThemeticProductDetail.setFileListAndUrl(themeticUrlList);
 
+//        //获取分析报告路径
+//        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
+//        singlePeriodThemeticProductDetail.setAnalysisReportUrl(path1);
+//        //获取全部文件URL
+//        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//        singlePeriodThemeticProductDetail.setAllFileDownloadUrl(path4);
 
-        //获取全部文件URL
-        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        singlePeriodThemeticProductDetail.setAllFileDownloadUrl(path4);
-
-        //获取缩略图url
-        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        singlePeriodThemeticProductDetail.setThumbnailUrl(path5);
+//        //获取缩略图url
+//        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//        singlePeriodThemeticProductDetail.setThumbnailUrl(path5);
+        for(int a=0;a<themeticUrlList.size();a++) {
+            if(themeticUrlList.get(a).getFileName().contains("jpg"))
+            {
+                System.out.println("removejpg"+themeticUrlList.get(a).getFileName());
+                singlePeriodThemeticProductDetail.setThumbnailUrl(themeticUrlList.get(a).getFileUrl());
+                themeticUrlList.remove(a);
+                break;
+            }
+        }
 
         return singlePeriodThemeticProductDetail;
     }
 
+//    @Override
+//    public  List<FileUrl> getFileListAndUrl(String productId) {
+//       // List<PdmProductStoreLinkInfo> productLinkList = iProductDownloadService.getProductLinkList(productId);
+//        List<FileUrl> urlList = new ArrayList<>();
+//        List<PdmProductStoreLinkInfo> productLinkList = iProductDownloadService.getProductLinkList(productId,null);
+//        for(int a=0;a<productLinkList.size();a++) {
+//            FileUrl fileUrl = new FileUrl();
+//            fileUrl.setFileName(productLinkList.get(a).getFileName());
+//            fileUrl.setFileUrl(productLinkList.get(a).getStoreLink());
+//            urlList.add(fileUrl);
+//        }
+//        return  urlList;
+//    }
     @Override
     //获取文件列表和URL
-    public  List<FileUrl> getFileListAndUrl (String path){
-        File pf=new File(path);
-        List<String> fileList=new ArrayList<>();
-        String [] fileString=pf.list();
-        for(String s:fileString) {
-            fileList.add(s);
-        }
+    public  List<FileUrl> getFileListAndUrl (String productId,String singlePeriodProductId){
+//        File pf=new File(path);
+//        List<String> fileList=new ArrayList<>();
+//        String [] fileString=pf.list();
+//        for(String s:fileString) {
+//            fileList.add(s);
+//        }
+        List<PdmProductStoreLinkInfo> productLinkList = iProductDownloadService.getProductLinkList(productId,singlePeriodProductId);
+
         List<FileUrl> urlList = new ArrayList<>();
-        String url="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        for(int a=0;a<fileList.size();a++) {
+        //String url="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+        for(int a=0;a<productLinkList.size();a++) {
             FileUrl fileUrl = new FileUrl();
-            fileUrl.setFileName(fileList.get(a));
-            fileUrl.setFileUrl(url);
+            fileUrl.setFileName(productLinkList.get(a).getFileName());
+            fileUrl.setFileUrl(productLinkList.get(a).getStoreLink());
             urlList.add(fileUrl);
         }
         return urlList;
@@ -137,6 +162,13 @@ public class MetadataServiceImpl implements IMetadataService {
         themeticProductDetail.setClientName(themeticProductDetailPart1.getClientName());
         themeticProductDetail.setDelieverName(themeticProductDetailPart1.getDelieverName());
         themeticProductDetail.setDelieverTime(themeticProductDetailPart1.getDelieverTime());
+        //获取分析报告路径
+        //String parentDirect=iProductDownloadService.getEntityFilePath(productId);
+        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
+        themeticProductDetail.setAnalysisReportUrl(path1);
+        //获取全部文件URL
+        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+        themeticProductDetail.setAllFileDownloadUrl(path4);
         Integer size=pdmThemeticProductDetailInfoMapper.countSinglePeriodThemeticProductId(productId);
        // System.err.println("size"+size);
         List<SinglePeriodThemeticProductDetail> list =new ArrayList<>();
@@ -188,24 +220,43 @@ public class MetadataServiceImpl implements IMetadataService {
 
        String path =pdmOrthoProductInfo.getOrthoProductDirectory();
        //获取分析报告路径，后续需要改
-       String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-       orthoProductDetail.setAnalysisReportUrl(path1);
-
-       //获取文件列表和URL
-       String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-       List<FileUrl> orthoUrlList = getFileListAndUrl(path3);
-
-       orthoProductDetail.setFileListAndUrl(orthoUrlList);
-
-
+//       String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
+//       orthoProductDetail.setAnalysisReportUrl(path1);
+//
+//       //获取文件列表和URL
+//       String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//       List<FileUrl> orthoUrlList = getFileListAndUrl(path3);
+//
+//       orthoProductDetail.setFileListAndUrl(orthoUrlList);
+//
+//
        //获取全部文件URL
        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
        orthoProductDetail.setAllFileDownloadUrl(path4);
+//
+//       //获取缩略图url
+//       String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//       orthoProductDetail.setThumbnailUrl(path5);
+        List<FileUrl> orthoUrlList = getFileListAndUrl(productId,null);
 
-       //获取缩略图url
-       String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-       orthoProductDetail.setThumbnailUrl(path5);
+        for(int a=0;a<orthoUrlList.size();a++)
+        {
+            if(orthoUrlList.get(a).getFileName().contains("jpg"))
+            {
+                System.out.println("removejpg"+orthoUrlList.get(a).getFileName());
+                orthoProductDetail.setThumbnailUrl(orthoUrlList.get(a).getFileUrl());
+                orthoUrlList.remove(a);
 
+            }else if(orthoUrlList.get(a).getFileName().contains("pdf"))
+            {
+                System.out.println("removepdf"+orthoUrlList.get(a).getFileName());
+                orthoProductDetail.setAnalysisReportUrl(orthoUrlList.get(a).getFileUrl());
+                orthoUrlList.remove(a);
+
+            }
+
+        }
+        orthoProductDetail.setFileListAndUrl(orthoUrlList);
        return orthoProductDetail;
    }
 
@@ -228,24 +279,40 @@ public class MetadataServiceImpl implements IMetadataService {
 
         String path =pdmInlayProductInfo.getInlayProductDirectory();
         //获取分析报告路径，后续需要改
-        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-        inlayProductDetail.setAnalysisReportUrl(path1);
-
-        //获取文件列表和URL
-        String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        List<FileUrl> inlayUrlList = getFileListAndUrl(path3);
-
-        inlayProductDetail.setFileListAndUrl(inlayUrlList);
-
-
+//        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
+//        inlayProductDetail.setAnalysisReportUrl(path1);
+//
+//        //获取文件列表和URL
+//        String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//        List<FileUrl> inlayUrlList = getFileListAndUrl(path3);
+//
+//        inlayProductDetail.setFileListAndUrl(inlayUrlList);
+//
+//
         //获取全部文件URL
         String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
         inlayProductDetail.setAllFileDownloadUrl(path4);
+//
+//        //获取缩略图url
+//        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//        inlayProductDetail.setThumbnailUrl(path5);
+       List<FileUrl> inlayUrlList = getFileListAndUrl(productId,null);
 
-        //获取缩略图url
-        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        inlayProductDetail.setThumbnailUrl(path5);
+       for(int a=0;a<inlayUrlList.size();a++) {
+           if(inlayUrlList.get(a).getFileName().contains("jpg"))
+           {
+               System.out.println("removejpg"+inlayUrlList.get(a).getFileName());
+               inlayProductDetail.setThumbnailUrl(inlayUrlList.get(a).getFileUrl());
+               inlayUrlList.remove(a);
 
+           }else if(inlayUrlList.get(a).getFileName().contains("pdf"))
+           {
+               System.out.println("removepdf"+inlayUrlList.get(a).getFileName());
+               inlayProductDetail.setAnalysisReportUrl(inlayUrlList.get(a).getFileUrl());
+               inlayUrlList.remove(a);
+           }
+
+       }
 
         return inlayProductDetail;
 
@@ -279,24 +346,40 @@ public class MetadataServiceImpl implements IMetadataService {
 
        String path =pdmSubdivisionProductInfo.getSubdivisionProductDirectory();
         //获取分析报告路径，后续需要改
-        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-        subdivisionProductDetail.setAnalysisReportUrl(path1);
-
-        //获取文件列表和URL
-        String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        List<FileUrl> subdivisionUrlList = getFileListAndUrl(path3);
-
-        subdivisionProductDetail.setFileListAndUrl(subdivisionUrlList);
-
-
+//        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
+//        subdivisionProductDetail.setAnalysisReportUrl(path1);
+//
+//        //获取文件列表和URL
+//        String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//        List<FileUrl> subdivisionUrlList = getFileListAndUrl(path3);
+//
+//        subdivisionProductDetail.setFileListAndUrl(subdivisionUrlList);
+//
+//
         //获取全部文件URL
         String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
         subdivisionProductDetail.setAllFileDownloadUrl(path4);
+//
+//        //获取缩略图url
+//        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+//        subdivisionProductDetail.setThumbnailUrl(path5);
+        List<FileUrl> subdivisionUrlList = getFileListAndUrl(productId,null);
 
-        //获取缩略图url
-        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        subdivisionProductDetail.setThumbnailUrl(path5);
+        for(int a=0;a<subdivisionUrlList.size();a++) {
+            if(subdivisionUrlList.get(a).getFileName().contains("jpg"))
+            {
+                System.out.println("removejpg"+subdivisionUrlList.get(a).getFileName());
+                subdivisionProductDetail.setThumbnailUrl(subdivisionUrlList.get(a).getFileUrl());
+                subdivisionUrlList.remove(a);
 
+            }else if(subdivisionUrlList.get(a).getFileName().contains("pdf"))
+            {
+                System.out.println("removepdf"+subdivisionUrlList.get(a).getFileName());
+                subdivisionProductDetail.setAnalysisReportUrl(subdivisionUrlList.get(a).getFileUrl());
+                subdivisionUrlList.remove(a);
+            }
+
+        }
     return subdivisionProductDetail;
 
     }
