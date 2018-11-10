@@ -14,6 +14,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,9 @@ public class ProductArchiveController {
     @Autowired
     LayerPublishService layerPublishService;
 
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
     @RequestMapping(value = "/test")
     @CrossOrigin(methods = RequestMethod.GET)
     @ResponseBody
@@ -53,9 +57,10 @@ public class ProductArchiveController {
 
 //       return ResultUtil.success(iProductArchiveService.getSecondaryFileStructure("C:\\Users\\37753\\Desktop\\tmpPic\\哈哈"));
 //        iProductArchiveService.copyFolder("C:\\Users\\37753\\Desktop\\产品管理后台\\pdm\\专题产品","C:\\Users\\37753\\Desktop\\产品管理后台\\pdm\\高级产品");
+        String content="打死啊是";
+        amqpTemplate.convertAndSend("publishOrder",content);
 
-
-        return ResultUtil.success(iProductArchiveService.getDeliverNameList(""));
+        return ResultUtil.success(content);
     }
 
     @RequestMapping("/downloadFile")//没用这个函数
