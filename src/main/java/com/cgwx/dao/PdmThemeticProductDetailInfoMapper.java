@@ -1,5 +1,6 @@
 package com.cgwx.dao;
 
+import com.cgwx.data.dto.ThemeticProductSimpleInfo;
 import com.cgwx.data.entity.PdmThemeticProductDetailInfo;
 import org.apache.ibatis.annotations.*;
 
@@ -169,6 +170,43 @@ public interface PdmThemeticProductDetailInfoMapper {
         //查询多期专题展品中每期的id
     List<String> selecSinglePeriodThemeticProductList(@Param("productId") String productId);
 
+    @Select("<script>"
+            +"SELECT product_id,st_asgeojson(image_geo) as geo,single_period_product_id\n" +
+            "            FROM pdm_themetic_product_detail_info\n"+
+            "            WHERE 1=1 \n"+
+            "<if test='null!= producer &amp; !\"\".equals(producer)'>"
+            + "and producer like CONCAT('%',#{producer},'%') "
+            +"</if>"
+            +"<if test='null!=image_geo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"</if>"
+            +"</script>")
+    @Results({@Result(
+            column = "geo",
+            property = "imageGeo"
 
+    ), @Result(
+            column = "product_id",
+            property = "productId"
+    ), @Result(
+            column = "single_period_product_id",
+            property = "singlePeriodId")
+    })
+    List<ThemeticProductSimpleInfo> selectSimpleinfoByProducerandGeo(@Param("producer")String producer,
+                                                                     @Param("image_geo")Object image_geo);
+    @Select({"SELECT product_id,st_asgeojson(image_geo) as geo,single_period_product_id\n" +
+            "            FROM pdm_themetic_product_detail_info\n"
+    })
+    @Results({@Result(
+            column = "geo",
+            property = "imageGeo"
 
+    ), @Result(
+            column = "product_id",
+            property = "productId"
+    ), @Result(
+            column = "single_period_product_id",
+            property = "singlePeriodId")
+    })
+    List<ThemeticProductSimpleInfo> selectSimpleinfotest();
 }

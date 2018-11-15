@@ -5,13 +5,14 @@
 
 package com.cgwx.dao;
 
+import com.cgwx.data.dto.AdvanceProductSimpleInfo;
 import com.cgwx.data.dto.SubdivisionProductList;
+import com.cgwx.data.dto.ThemeticProductSimpleInfo;
 import com.cgwx.data.entity.PdmSubdivisionProductInfo;
+import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-
-import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface PdmSubdivisionProductInfoMapper {
@@ -148,5 +149,56 @@ public interface PdmSubdivisionProductInfoMapper {
                                                                       @Param("delieverName") String delieverName,
                                                                       @Param("resolution") BigDecimal resolution, @Param("industry") String industry);
 
+    @Select({"SELECT product_id,st_asgeojson(image_geo) as geo\n" +
+            "            FROM pdm_subdivision_product_info\n"
+    })
+    @Results({@Result(
+            column = "geo",
+            property = "imageGeo"
 
+    ), @Result(
+            column = "product_id",
+            property = "productId")
+    })
+    List<ThemeticProductSimpleInfo> selectSimpleinfo();
+
+
+
+    @Select("<script>"
+            +"SELECT product_id,st_asgeojson(image_geo) as geo, subdivision_product_name\n" +
+            "            FROM pdm_subdivision_product_info  \n"+
+            "            WHERE 1=1 \n"+
+            "<if test='null!= producer &amp; !\"\".equals(producer)'>"
+            + "and producer like CONCAT('%',#{producer},'%') "
+            +"</if>"
+            +"<if test='null!=image_geo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"</if>"
+            +"and product_id IN ("
+            + "SELECT product_id \n" +
+            "            FROM pdm_product_info \n" +
+            "            WHERE 1=1 \n" +
+            "<if test='null!= client_name &amp; !\"\".equals(client_name)'>"
+            + "and client_name like CONCAT('%',#{client_name},'%')"
+            + "</if>"
+            + "<if test='null!= productDescription &amp; !\"\".equals(productDescription)'>"
+            + "and product_description like CONCAT('%',#{productDescription},'%')"
+            + "</if>"
+            +")"
+            +"</script>")
+    @Results({@Result(
+            column = "geo",
+            property = "imageGeo"
+
+    ), @Result(
+            column = "product_id",
+            property = "productId"
+    ), @Result(
+            column = "subdivision_product_name",
+            property = "productName"
+    )})
+    List<AdvanceProductSimpleInfo> selectSimpleinfoByconditions(@Param("producer")String producer,
+                                                                @Param("image_geo")Object image_geo,
+                                                                @Param("client_name")String clientName,
+                                                                @Param("productDescription")String description);
 }

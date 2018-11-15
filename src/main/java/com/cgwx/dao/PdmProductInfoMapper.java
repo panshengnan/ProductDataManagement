@@ -7,9 +7,9 @@ package com.cgwx.dao;
 
 import com.cgwx.data.dto.ProductQueryList;
 import com.cgwx.data.entity.PdmProductInfo;
-import java.util.List;
-
 import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 
 @Mapper
 public interface PdmProductInfoMapper {
@@ -190,5 +190,27 @@ public interface PdmProductInfoMapper {
     )})
     List<ProductQueryList> selectSubdivisionProductByCondition(@Param("productName") String productName, @Param("productDescription") String productDescription, @Param("orderby") String orderby);
 
+    @Select("<script>"
+            +"SELECT product_id \n"+
+            "FROM pdm_product_info \n"+
+            "WHERE 1=1 \n"+
+            "<if test='null!= client_name &amp; !\"\".equals(client_name)'>"
+            + "and client_name like CONCAT('%',#{client_name},'%')"
+            + "</if>"
+            + "<if test='null!= productDescription &amp; !\"\".equals(productDescription)'>"
+            + "and product_description like CONCAT('%',#{productDescription},'%')"
+            + "</if>"
+            +"</script>")
+    List<String> getProductIdlistByclientanddescription(@Param("client_name")String client_name,@Param("productDescription")String description);
 
+    @Select("<script>"
+            +"SELECT product_name \n"+
+            "FROM pdm_product_info \n"+
+            "WHERE 1=1 \n"+
+            "<if test='null!=product_id  &amp; !\"\".equals(product_id)'>"
+            + "and product_id=#{product_id}"
+            + "</if>"
+            +"</script>")
+
+    String getProductNameById(@Param("product_id")String productId);
 }

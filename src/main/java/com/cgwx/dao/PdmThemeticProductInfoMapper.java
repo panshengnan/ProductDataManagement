@@ -7,9 +7,9 @@ package com.cgwx.dao;
 
 import com.cgwx.data.dto.ThemeticProductList;
 import com.cgwx.data.entity.PdmThemeticProductInfo;
-import java.util.List;
-
 import org.apache.ibatis.annotations.*;
+
+import java.util.List;
 
 @Mapper
 public interface PdmThemeticProductInfoMapper {
@@ -149,6 +149,10 @@ public interface PdmThemeticProductInfoMapper {
     List<ThemeticProductList> selectThemeticProductByCondition(@Param("productName") String productName, @Param("orderby") String orderby,
                                                                @Param("satellite") String satellite, @Param("industry") String industry, @Param("sensor") String sensor, @Param("clientName") String clientName,
                                                                @Param("delieverName") String delieverName);
-
+//    @Select({"SELECT product_id\n" +
+//            "            FROM pdm_themetic_product_info\n" +
+//            "            WHERE product_id = #{productId}"
+//    })
+//    List<ThemeticProductSimpleInfo> selectSimpleinfo();
 
 }

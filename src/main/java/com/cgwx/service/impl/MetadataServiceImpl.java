@@ -8,7 +8,6 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -21,6 +20,8 @@ public class MetadataServiceImpl implements IMetadataService {
 
     @Autowired
     PdmThemeticProductDetailInfoMapper pdmThemeticProductDetailInfoMapper;
+    @Autowired
+    PdmThemeticProductDetailIndustryInfoMapper pdmThemeticProductDetailIndustryInfoMapper;
 
     @Autowired
     PdmOrthoProductInfoMapper pdmOrthoProductInfoMapper;
@@ -80,24 +81,10 @@ public class MetadataServiceImpl implements IMetadataService {
 
         String path =themeticProductDetailPart1.getParentDirectory();
 
-
-
-
         //获取文件列表和对应的URL
         String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\1";
         List<FileUrl> themeticUrlList = getFileListAndUrl(productId,singlePeriodProductId);
         singlePeriodThemeticProductDetail.setFileListAndUrl(themeticUrlList);
-
-//        //获取分析报告路径
-//        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-//        singlePeriodThemeticProductDetail.setAnalysisReportUrl(path1);
-//        //获取全部文件URL
-//        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//        singlePeriodThemeticProductDetail.setAllFileDownloadUrl(path4);
-
-//        //获取缩略图url
-//        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//        singlePeriodThemeticProductDetail.setThumbnailUrl(path5);
         for(int a=0;a<themeticUrlList.size();a++) {
             if(themeticUrlList.get(a).getFileName().contains("jpg"))
             {
@@ -111,19 +98,6 @@ public class MetadataServiceImpl implements IMetadataService {
         return singlePeriodThemeticProductDetail;
     }
 
-//    @Override
-//    public  List<FileUrl> getFileListAndUrl(String productId) {
-//       // List<PdmProductStoreLinkInfo> productLinkList = iProductDownloadService.getProductLinkList(productId);
-//        List<FileUrl> urlList = new ArrayList<>();
-//        List<PdmProductStoreLinkInfo> productLinkList = iProductDownloadService.getProductLinkList(productId,null);
-//        for(int a=0;a<productLinkList.size();a++) {
-//            FileUrl fileUrl = new FileUrl();
-//            fileUrl.setFileName(productLinkList.get(a).getFileName());
-//            fileUrl.setFileUrl(productLinkList.get(a).getStoreLink());
-//            urlList.add(fileUrl);
-//        }
-//        return  urlList;
-//    }
     @Override
     //获取文件列表和URL
     public  List<FileUrl> getFileListAndUrl (String productId,String singlePeriodProductId){
@@ -151,6 +125,11 @@ public class MetadataServiceImpl implements IMetadataService {
        // System.err.println("id"+productId);
         ThemeticProductDetail themeticProductDetail =new ThemeticProductDetail();
         PdmThemeticProductInfo themeticProductDetailPart1= pdmThemeticProductInfoMapper.selectThemeticProductDetailPart1ByProductId(productId);
+        if(themeticProductDetailPart1==null)
+        {
+            System.out.println("no product");
+            return  themeticProductDetail;
+        }
         themeticProductDetail.setProductId(themeticProductDetailPart1.getProductId());
         themeticProductDetail.setThemeticProductName(themeticProductDetailPart1.getThemeticProductName());
         themeticProductDetail.setIndustry(themeticProductDetailPart1.getIndustry());
@@ -523,7 +502,188 @@ public class MetadataServiceImpl implements IMetadataService {
         subdivisionProductListResult.setProductQueryList(subdivisionProductList);
         return subdivisionProductListResult;
     }
-
-
+    @Override
+    public List<ThemeticProductSimpleInfo> getThemeticSimpleProductlist(Object geo, String producer){
+        List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList =new ArrayList<ThemeticProductSimpleInfo>();
+            themeticProductSimpleInfoList =pdmThemeticProductDetailInfoMapper.selectSimpleinfoByProducerandGeo(producer,geo);
+       // System.out.println(themeticProductSimpleInfoList.get(0).getImageGeo());
+        return themeticProductSimpleInfoList;
     }
+    @Override
+    public List<ThemeticProductSimpleInfo> testgetSimpleProductlist(int type){
+        List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList =new ArrayList<ThemeticProductSimpleInfo>();
+            themeticProductSimpleInfoList =pdmThemeticProductDetailInfoMapper.selectSimpleinfotest();
+
+        return themeticProductSimpleInfoList;
+    }
+
+    @Override
+    public List<String> getProductIdlist(String clientname,String description){
+        List<String> productIdlist=new ArrayList<String>();
+        //System.out.println(clientname+" "+description+" ++");
+        productIdlist=pdmProductInfoMapper.getProductIdlistByclientanddescription(clientname,description);
+        return  productIdlist;
+    }
+    @Override
+    public List<String> getProductIdlistFromIndustry(int level1,int level2)
+    {
+        List<String> productIdList=new ArrayList<String>();
+        productIdList=pdmThemeticProductDetailIndustryInfoMapper.selectThemeticidByIndustry(level1,level2);
+        return productIdList;
+    }
+    @Override
+    public void mergeThemeticSimpleInfoListByProductIdlist(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList, List<String>productIdlist)
+    {
+        if(productIdlist==null)
+        {
+           // System.out.println("productidnull");
+            for(int i=themeticProductSimpleInfoList.size()-1;i>=0;i--)
+            {
+                themeticProductSimpleInfoList.remove(i);
+            }
+
+            return;
+        }
+        if(themeticProductSimpleInfoList.isEmpty())
+        {
+            return;
+        }
+        List<Integer> forremove=new ArrayList<Integer>();                //记录需要移除的产品
+        for(int i = 0; i< themeticProductSimpleInfoList.size(); i++)
+        {
+            //System.out.println("judge:"+themeticProductSimpleInfoList1.get(i).getProductId()+"I=:"+i);
+            boolean flag=false;
+            for (int j=0;j<productIdlist.size();j++)
+            {
+                if(themeticProductSimpleInfoList.get(i).getProductId().equals(productIdlist.get(j)))
+                {
+                    flag=true;
+                    break;
+                }
+            }
+            if(flag==false)
+            {
+                forremove.add(i);
+
+            }
+        }
+        System.out.println(forremove);
+        for(int i=forremove.size()-1;i>=0;i--)
+        {
+            int rem=forremove.get(i);
+            themeticProductSimpleInfoList.remove(rem);
+        }
+    }
+    @Override
+    public void printThemeticSimpleInfoList(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList)
+    {
+        for(int i=0; i<themeticProductSimpleInfoList.size();i++)
+        {
+            System.out.print(themeticProductSimpleInfoList.get(i).getSinglePeriodId()+" "+themeticProductSimpleInfoList.get(i).getProductId()+" ");
+        }
+        System.out.println();
+    }
+    @Override
+    public List<String> getProductIdlistByIndustryList( List<Industry> industryList){
+        List<String> productIdlistFromIndustry=new ArrayList<String>();
+        if(industryList==null)
+        {
+            List<String> stringListtemp=getProductIdlistFromIndustry(10000,10000);
+            return stringListtemp;
+        }
+        for(int i=0;i<industryList.size();i++)
+        {
+            List<String> stringListtemp=getProductIdlistFromIndustry(industryList.get(i).getLevel1(),industryList.get(i).getLevel2());
+           // System.out.println("string"+stringListtemp);
+            if(stringListtemp.isEmpty())
+            {
+                return null;
+            }
+            if (productIdlistFromIndustry.size()==0)
+            {
+                productIdlistFromIndustry=stringListtemp;
+            }
+            else
+            {
+                for(int j=productIdlistFromIndustry.size()-1;j>=0;j--)
+                {
+                    boolean flag=false;
+                    for(int k=0;k<stringListtemp.size();k++)
+                    {
+                        if(productIdlistFromIndustry.get(j).equals(stringListtemp.get(k)))
+                        {
+                            flag=true;
+                            break;
+                        }
+                    }
+                    if(flag==false)
+                    {
+                        productIdlistFromIndustry.remove(j);
+                    }
+                }
+            }
+        }
+        return productIdlistFromIndustry;
+    }
+    @Override
+    public List<ThemeticProductListByGeosResult> packetSingleThemeticProductToThemetic(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList){
+        List<ThemeticProductListByGeosResult> themeticProductListByGeosResultList=new ArrayList<ThemeticProductListByGeosResult>();
+        if(themeticProductSimpleInfoList==null||themeticProductSimpleInfoList.isEmpty())
+        {
+            return null;
+        }
+        while (themeticProductSimpleInfoList.isEmpty()==false)
+        {
+            ThemeticProductListByGeosResult themeticProductListByGeosResulttemp=new ThemeticProductListByGeosResult();
+            List<ThemeticProductSimpleInfo> themeticProductListtemp =new ArrayList<ThemeticProductSimpleInfo>();
+            String themeticProductIdtemp=themeticProductSimpleInfoList.get(0).getProductId();
+            for(int i=themeticProductSimpleInfoList.size()-1;i>=0;i--)
+            {
+                if(themeticProductSimpleInfoList.get(i).getProductId().equals(themeticProductIdtemp));
+                themeticProductListtemp.add(themeticProductSimpleInfoList.get(i));
+                themeticProductSimpleInfoList.remove(i);
+            }
+            themeticProductListByGeosResulttemp.setThemeticProductSimpleInfoList(themeticProductListtemp);
+            themeticProductListByGeosResulttemp.setProductId(themeticProductIdtemp);
+            themeticProductListByGeosResulttemp.setIndustryList(getIndustryByProductid(themeticProductIdtemp));
+            themeticProductListByGeosResulttemp.setProductName(pdmProductInfoMapper.getProductNameById(themeticProductIdtemp));
+            themeticProductListByGeosResultList.add(themeticProductListByGeosResulttemp);
+
+        }
+
+        return themeticProductListByGeosResultList;
+    }
+    @Override
+    public List<Industry> getIndustryByProductid(String productId)
+    {
+        List<Industry> industryList=new ArrayList<Industry>();
+        industryList=pdmThemeticProductDetailIndustryInfoMapper.selectIndustryByProductid(productId);
+        for(int i=0;i<industryList.size();i++)
+        {
+            System.out.println(industryList.get(i).getLevel1()+"  "+industryList.get(i).getLevel2());
+        }
+        return industryList;
+    }
+    @Override
+    public List<AdvanceProductSimpleInfo> getAdvanceProductSimpleInfoList(String producer,Object image_geo,String clientName,String description)
+    {
+        List<AdvanceProductSimpleInfo> advanceProductSimpleInfoList=new ArrayList<AdvanceProductSimpleInfo>();
+        List<AdvanceProductSimpleInfo> advanceProductSimpleInfoListtemp1=new ArrayList<AdvanceProductSimpleInfo>();
+        List<AdvanceProductSimpleInfo> advanceProductSimpleInfoListtemp2=new ArrayList<AdvanceProductSimpleInfo>();
+        advanceProductSimpleInfoList=pdmOrthoProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
+        advanceProductSimpleInfoListtemp1=pdmInlayProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
+        for (int i=0;i<advanceProductSimpleInfoListtemp1.size();i++)
+        {
+            advanceProductSimpleInfoList.add(advanceProductSimpleInfoListtemp1.get(i));
+        }
+        advanceProductSimpleInfoListtemp2=pdmSubdivisionProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
+        for (int i=0;i<advanceProductSimpleInfoListtemp2.size();i++)
+        {
+            advanceProductSimpleInfoList.add(advanceProductSimpleInfoListtemp2.get(i));
+        }
+        return advanceProductSimpleInfoList;
+    }
+
+
+}
 
