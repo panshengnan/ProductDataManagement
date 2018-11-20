@@ -15,6 +15,7 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +32,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -70,6 +72,9 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
 
     @Autowired
     PdmThemeticProductDetailInfoMapper pdmThemeticProductDetailInfoMapper;
+
+    @Autowired
+    PdmProducerInfoMapper pdmProducerInfoMapper;
 
     @Override/*上传文件*/
     public UploadFileReturn uploadFile(MultipartFile file) {
@@ -390,8 +395,8 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         return secondaryFileStructure;
     }
 
-    @Override /* 复制文件内容 */
-    public void copyFile(String oldPath, String newPath) {
+    /* 复制文件内容 */
+    public void copyFile(String oldPath, String newPath){
         try {
             int bytesum = 0;
             int byteread = 0;
@@ -403,7 +408,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
                 int length;
                 while ( (byteread = inStream.read(buffer)) != -1) {
                     bytesum += byteread; //字节数 文件大小
-                    System.out.println(bytesum);
+                   // System.out.println(bytesum);
                     fs.write(buffer, 0, byteread);
                 }
                 inStream.close();
@@ -415,6 +420,14 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
 
         }
 
+    }
+
+    @Override /* 复制文件内容 */
+    public void copyFile(File source, File dest) {
+        try {
+            FileUtils.copyFile(source, dest);
+        } catch (Exception e) {
+        }
     }
 
     @Override/*复制整个文件夹内容*/
@@ -473,7 +486,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     @Override/**/
     public List<String> getProducerList(String producer){
 
-        return pdmProductInfoMapper.selectProducerList(producer);
+        return pdmProducerInfoMapper.selectProducerList(producer);
     }
 
     @Override/**/
@@ -509,5 +522,29 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     public int updateThemeticProduct(PdmThemeticProductInfo pdmThemeticProductInfo){
 
         return pdmThemeticProductInfoMapper.insert(pdmThemeticProductInfo);
+    }
+
+    @Override
+    public int insertPdmProducerInfo(String producerName){
+
+        PdmProducerInfo pdmProducerInfo = new PdmProducerInfo();
+        pdmProducerInfo.setProducer(producerName);
+        return pdmProducerInfoMapper.insert(pdmProducerInfo);
+    }
+
+    @Override
+    public int selectCountByProducerName(String producerName){
+
+        return pdmProducerInfoMapper.selectCountByProducerName(producerName);
+    }
+
+    @Override
+    public int updatePdmProducerInfo(String producerName){
+
+        int count = selectCountByProducerName(producerName);
+        if (count == 0) {
+            insertPdmProducerInfo(producerName);
+        }
+        return 1;
     }
 }

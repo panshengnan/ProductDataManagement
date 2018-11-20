@@ -146,10 +146,17 @@ public class ProductArchiveController {
         }
         String tempPath = iProductArchiveService.getThemeticProductTemporaryPath(jsonObject.getString("tempId"));
         String officialPath = System.getProperty("user.dir") + "\\officialStorage\\专题产品\\" + productName;
+        String zipFilePath = tempPath+".zip";
+        String zipFileTargetPath = officialPath + "\\"+productName+".zip";
+        System.out.println("zip文件路径为："+zipFilePath);
+        System.out.println("zip文件目的路径为："+zipFileTargetPath);
         File file = new File(officialPath);
         if (!file.exists())
             file.mkdir();
         iProductArchiveService.copyFolder(tempPath, officialPath);
+        File zipFile = new File(zipFilePath);
+        File zipTargetFile = new File(zipFileTargetPath);
+        iProductArchiveService.copyFile(zipFile,zipTargetFile);
         JSONArray singlePeriodProductInfoJsonArray = jsonObject.getJSONArray("singlePeriodProductInfo");
         PdmThemeticProductDetailInfo pdmThemeticProductDetailInfo = new PdmThemeticProductDetailInfo();
         for (int i = 0; i < singlePeriodProductInfoJsonArray.size(); i++) {
@@ -161,6 +168,9 @@ public class ProductArchiveController {
                 System.out.println(pe.getMessage());
             }
             pdmThemeticProductDetailInfo.setProducer(jsonObjectTmp.getString("producer"));
+            //更新producer
+            iProductArchiveService.insertPdmProducerInfo(jsonObjectTmp.getString("producer"));
+            //
             String produceTime = jsonObjectTmp.getString("produceTime").replace("T", " ");
             try {
                 pdmThemeticProductDetailInfo.setProduceTime(dateFormat.parse(produceTime));
@@ -204,6 +214,7 @@ public class ProductArchiveController {
     public Result getProducerList(String producer) {
         return ResultUtil.success(iProductArchiveService.getProducerList(producer));
     }
+
 
 
 }
