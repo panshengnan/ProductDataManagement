@@ -3,7 +3,7 @@ package com.cgwx.data.dto;
 public class AreaInfoDto {
     private Integer areaId;
     private String areaName;
-    private String areaGeojson;
+    private Object areaGeojson;
 
     public Integer getAreaId() {
         return areaId;
@@ -21,11 +21,11 @@ public class AreaInfoDto {
         this.areaName = areaName;
     }
 
-    public String getAreaGeojson() {
+    public Object getAreaGeojson() {
         return areaGeojson;
     }
 
-    public void setAreaGeojson(String areaGeojson) {
+    public void setAreaGeojson(Object areaGeojson) {
         this.areaGeojson = areaGeojson;
     }
 }

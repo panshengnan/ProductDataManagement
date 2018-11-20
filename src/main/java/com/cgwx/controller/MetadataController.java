@@ -8,6 +8,7 @@ import com.cgwx.dao.PdmProductTypeInfoMapper;
 import com.cgwx.dao.PdmThemeticProductDetailInfoMapper;
 import com.cgwx.data.dto.*;
 import com.cgwx.service.IMetadataService;
+import com.cgwx.service.impl.IProductArchiveServiceImpl;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,7 +32,8 @@ public class MetadataController
     PdmProductInfoMapper pdmProductInfoMapper;
     @Autowired
     PdmProductTypeInfoMapper pdmProductTypeInfoMapper;
-
+    @Autowired
+    IProductArchiveServiceImpl iProductArchiveService;
 
 
 
@@ -244,77 +246,95 @@ public class MetadataController
     @ResponseBody
     public Result getThemeticProductListByGeos(@RequestParam(value = "json", required = true) String json )
     {
-        System.out.println(json);
-        String clientname=new String();
-        String productDescription=new String();
-        String producer=new String();
-        JSONObject jsonObject = JSONObject.fromObject(json);
-        if(jsonObject.getString("client_name")=="null")
-        {
-            clientname=null;
-        }
-        else
-        {
-            clientname=jsonObject.getString("client_name");
-        }
-        if(jsonObject.getString("product_description")=="null")
-        {
-            productDescription=null;
-        }
-        else
-        {
-            productDescription=jsonObject.getString("product_description");
-        }
-        if(jsonObject.getString("producer")=="null")
-        {
-            //System.out.println("producernull");
-            producer=null;
-        }
-        else
-        {
-            producer=jsonObject.getString("producer");
-        }
-        List<Industry> queryIndustryList =new ArrayList<Industry>();
-        //System.out.println(jsonObject.getString("industry"));
-        if(jsonObject.getString("industry")=="null")
-        {
-
-            queryIndustryList =null;
-        }
-        else
-        {
-            JSONArray jsonArray=jsonObject.getJSONArray("industry");
-
-            for(int i=0;i<jsonArray.size();i++)
-            {
-                Industry industrytemp=new Industry();
-                industrytemp.setLevel1(jsonArray.getJSONObject(i).getInt("level1"));
-                industrytemp.setLevel2(jsonArray.getJSONObject(i).getInt("level2"));
-                System.out.println(industrytemp.getLevel1()+" "+industrytemp.getLevel2());
-                queryIndustryList.add(industrytemp);
-            }
-        }
-
-        //获取满足clientname和productdescription的ID列表
-        List<String>productIdlist=metadataService.getProductIdlist(clientname,productDescription);
-        System.out.println("--"+productIdlist);
-        List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList =metadataService.testgetSimpleProductlist(1);//在数据库内找个GeoJSON
-        //获取满足GEO和producer的列表并与上一个列表合并
-        List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList1 =metadataService.getThemeticSimpleProductlist( themeticProductSimpleInfoList.get(115).getImageGeo(),producer);
-        metadataService.printThemeticSimpleInfoList(themeticProductSimpleInfoList1);
-        metadataService.mergeThemeticSimpleInfoListByProductIdlist(themeticProductSimpleInfoList1,productIdlist);
-        System.out.println("merge1");
-        metadataService.printThemeticSimpleInfoList(themeticProductSimpleInfoList1);
-        //获取满足行业信息的ID列表，并与上一个列表合并。
-        List<String> productIdlistFromIndustry=new ArrayList<String>();
-        productIdlistFromIndustry=metadataService.getProductIdlistByIndustryList(queryIndustryList);
-        System.out.println("industrylist:"+productIdlistFromIndustry);
-        metadataService.mergeThemeticSimpleInfoListByProductIdlist(themeticProductSimpleInfoList1,productIdlistFromIndustry);
-        List<ThemeticProductListByGeosResult> themeticProductListByGeosResultList=new ArrayList<ThemeticProductListByGeosResult>();
-        metadataService.printThemeticSimpleInfoList(themeticProductSimpleInfoList1);
-        themeticProductListByGeosResultList=metadataService.packetSingleThemeticProductToThemetic(themeticProductSimpleInfoList1);
-        return ResultUtil.success(themeticProductListByGeosResultList);
+    System.out.println(json);
+    String clientname=new String();
+    String productDescription=new String();
+    String producer=new String();
+    Object imageGeo=new Object();
+    JSONObject jsonObject = JSONObject.fromObject(json);
+    if(jsonObject.getString("client_name").equals(""))
+    {
+        clientname=null;
     }
+    else
+    {
+        clientname=jsonObject.getString("client_name");
+    }
+    if(jsonObject.getString("product_description").equals(""))
+    {
+        productDescription=null;
+    }
+    else
+    {
+        productDescription=jsonObject.getString("product_description");
+    }
+    if(jsonObject.getString("producer").equals(""))
+    {
+        //System.out.println("producernull");
+        producer=null;
+    }
+    else
+    {
+        producer=jsonObject.getString("producer");
+    }
+    List<Industry> queryIndustryList =new ArrayList<Industry>();
+    //System.out.println(jsonObject.getString("industry"));
+    if(jsonObject.getString("industry").equals("[]"))
+    {
+
+        queryIndustryList =null;
+    }
+    else
+    {
+        JSONArray jsonArray=jsonObject.getJSONArray("industry");
+
+        for(int i=0;i<jsonArray.size();i++)
+        {
+            Industry industrytemp=new Industry();
+            industrytemp.setLevel1(jsonArray.getJSONObject(i).getInt("level1"));
+            if(jsonArray.getJSONObject(i).getString("level2")=="null")
+            {
+                industrytemp.setLevel2(10000);
+            }
+            else
+            {
+                industrytemp.setLevel2(jsonArray.getJSONObject(i).getInt("level2"));
+            }
+
+            System.out.println(industrytemp.getLevel1()+" "+industrytemp.getLevel2());
+            queryIndustryList.add(industrytemp);
+        }
+    }
+    if(jsonObject.getString("image_geo").equals(""))
+    {
+        imageGeo=null;
+    }
+    else
+    {
+        imageGeo=jsonObject.getString("image_geo");
+    }
+    //获取满足clientname和productdescription的ID列表
+    List<String>productIdlist=metadataService.getProductIdlist(clientname,productDescription);
+    System.out.println("clientname+productDescription"+productIdlist);
+    // List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList =metadataService.testgetSimpleProductlist(1);//在数据库内找个GeoJSON
+    //获取满足GEO和producer的列表并与上一个列表合并
+    List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList1 =metadataService.getThemeticSimpleProductlist( imageGeo,producer);
+    System.out.println("imageGeo+producer");
+    metadataService.printThemeticSimpleInfoList(themeticProductSimpleInfoList1);
+    metadataService.mergeThemeticSimpleInfoListByProductIdlist(themeticProductSimpleInfoList1,productIdlist);
+    System.out.println("merge1");
+    metadataService.printThemeticSimpleInfoList(themeticProductSimpleInfoList1);
+    //获取满足行业信息的ID列表，并与上一个列表合并。
+    List<String> productIdlistFromIndustry=new ArrayList<String>();
+    productIdlistFromIndustry=metadataService.getProductIdlistByIndustryList(queryIndustryList);
+    System.out.println("industrylist:"+productIdlistFromIndustry);
+    metadataService.mergeThemeticSimpleInfoListByProductIdlist(themeticProductSimpleInfoList1,productIdlistFromIndustry);
+    List<ThemeticProductListByGeosResult> themeticProductListByGeosResultList=new ArrayList<ThemeticProductListByGeosResult>();
+    System.out.println("final");
+    metadataService.printThemeticSimpleInfoList(themeticProductSimpleInfoList1);
+    themeticProductListByGeosResultList=metadataService.packetSingleThemeticProductToThemeticProduct(themeticProductSimpleInfoList1);
+    return ResultUtil.success(themeticProductListByGeosResultList);
+}
 
 
 
@@ -327,7 +347,7 @@ public class MetadataController
         String productDescription=new String();
         String producer=new String();
         JSONObject jsonObject = JSONObject.fromObject(json);
-        if(jsonObject.getString("client_name")=="null")
+        if(jsonObject.getString("client_name").equals(""))
         {
             clientname=null;
         }
@@ -335,7 +355,7 @@ public class MetadataController
         {
             clientname=jsonObject.getString("client_name");
         }
-        if(jsonObject.getString("product_description")=="null")
+        if(jsonObject.getString("product_description").equals(""))
         {
             productDescription=null;
         }
@@ -343,7 +363,7 @@ public class MetadataController
         {
             productDescription=jsonObject.getString("product_description");
         }
-        if(jsonObject.getString("producer")=="null")
+        if(jsonObject.getString("producer").equals(""))
         {
             producer=null;
         }
@@ -356,6 +376,17 @@ public class MetadataController
         advanceProductSimpleInfoList=metadataService.getAdvanceProductSimpleInfoList(producer,null,clientname,productDescription);
 
         return ResultUtil.success(advanceProductSimpleInfoList);
+    }
+
+    @RequestMapping(value = "/clientlist")  //产品列表
+    @CrossOrigin(methods = RequestMethod.GET)
+    @ResponseBody
+    public Result getAllClientList( ) {
+        System.out.println(iProductArchiveService.getClientNameList(""));
+        List<String> clientlist=iProductArchiveService.getClientNameList("");
+        clientlist=metadataService.removeRepeat(clientlist);
+        System.out.println(clientlist);
+        return ResultUtil.success(clientlist);
     }
 }
 

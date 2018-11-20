@@ -5,7 +5,7 @@
 <generatorConfiguration>
     <classPathEntry
 
-    location="C:\Users\37753\.m2\repository\postgresql\postgresql\9.1-901-1.jdbc4\postgresql-9.1-901-1.jdbc4.jar"/>
+    location="C:\Users\user\.m2\repository\org\postgresql\postgresql\42.2.2\postgresql-42.2.2.jar"/>
     <context id="sysGenerator" targetRuntime="MyBatis3Simple">
         <commentGenerator>
             <!-- 是否生成注释代时间戳 -->
@@ -15,7 +15,7 @@
         </commentGenerator>
         <!--数据库连接的信息：驱动类、连接地址、用户名、密码-->
         <jdbcConnection driverClass="org.postgresql.Driver"
-                        connectionURL="jdbc:postgresql://127.0.0.1:5432/pdm?useUnicode=true&amp;characterEncoding=utf-8"
+                        connectionURL="jdbc:postgresql://192.168.20.7:5432/pdm?useUnicode=true&amp;characterEncoding=utf-8"
                         userId="postgres"
                         password="123456">
         </jdbcConnection>
@@ -63,7 +63,7 @@
             escapeWildcards：这个属性表示当查询列，是否对schema和表名中的SQL通配符 ('_' and '%') 进行转义。 对于某些驱动当schema或表名中包含SQL通配符时（例如，一个表名是MY_TABLE，有一些驱动需要将下划线进行转义）是必须的，默认值是false
             delimitIdentifiers：是否给标识符增加**分隔符**,默认false，当catalog,schema或tableName中包含空白时，默认为true，
             delimitAllColumns：是否对所有列添加**分隔符**，默认false-->
-        <table tableName="pdm_%" enableCountByExample="false"
+        <table tableName="pdm_domestic_area_info" enableCountByExample="false"
                enableUpdateByExample="false" enableDeleteByExample="false"
                enableSelectByExample="false" selectByExampleQueryId="false">
             <!--忽略列，不生成bean 字段-->

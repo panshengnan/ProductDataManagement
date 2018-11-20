@@ -567,7 +567,7 @@ public class MetadataServiceImpl implements IMetadataService {
 
             }
         }
-        System.out.println(forremove);
+        //System.out.println(forremove);
         for(int i=forremove.size()-1;i>=0;i--)
         {
             int rem=forremove.get(i);
@@ -626,7 +626,8 @@ public class MetadataServiceImpl implements IMetadataService {
         return productIdlistFromIndustry;
     }
     @Override
-    public List<ThemeticProductListByGeosResult> packetSingleThemeticProductToThemetic(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList){
+    public List<ThemeticProductListByGeosResult> packetSingleThemeticProductToThemeticProduct(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList){
+
         List<ThemeticProductListByGeosResult> themeticProductListByGeosResultList=new ArrayList<ThemeticProductListByGeosResult>();
         if(themeticProductSimpleInfoList==null||themeticProductSimpleInfoList.isEmpty())
         {
@@ -639,9 +640,13 @@ public class MetadataServiceImpl implements IMetadataService {
             String themeticProductIdtemp=themeticProductSimpleInfoList.get(0).getProductId();
             for(int i=themeticProductSimpleInfoList.size()-1;i>=0;i--)
             {
-                if(themeticProductSimpleInfoList.get(i).getProductId().equals(themeticProductIdtemp));
-                themeticProductListtemp.add(themeticProductSimpleInfoList.get(i));
-                themeticProductSimpleInfoList.remove(i);
+                if(themeticProductSimpleInfoList.get(i).getProductId().equals(themeticProductIdtemp))
+                {
+                    themeticProductListtemp.add(themeticProductSimpleInfoList.get(i));
+                    themeticProductSimpleInfoList.remove(i);
+
+                }
+
             }
             themeticProductListByGeosResulttemp.setThemeticProductSimpleInfoList(themeticProductListtemp);
             themeticProductListByGeosResulttemp.setProductId(themeticProductIdtemp);
@@ -658,10 +663,10 @@ public class MetadataServiceImpl implements IMetadataService {
     {
         List<Industry> industryList=new ArrayList<Industry>();
         industryList=pdmThemeticProductDetailIndustryInfoMapper.selectIndustryByProductid(productId);
-        for(int i=0;i<industryList.size();i++)
-        {
-            System.out.println(industryList.get(i).getLevel1()+"  "+industryList.get(i).getLevel2());
-        }
+//        for(int i=0;i<industryList.size();i++)
+//        {
+//            System.out.println(industryList.get(i).getLevel1()+"  "+industryList.get(i).getLevel2());
+//        }
         return industryList;
     }
     @Override
@@ -682,6 +687,24 @@ public class MetadataServiceImpl implements IMetadataService {
             advanceProductSimpleInfoList.add(advanceProductSimpleInfoListtemp2.get(i));
         }
         return advanceProductSimpleInfoList;
+    }
+
+    public List<String> removeRepeat(List<String> stringList)
+    {
+        List<String> returnstring=new ArrayList<String>();
+        while (stringList.isEmpty()==false)
+        {
+            String stringtemp=new String(stringList.get(0));
+            for(int i=stringList.size()-1;i>=0;i--)
+            {
+                if(stringtemp.equals(stringList.get(i)))
+                {
+                    stringList.remove(i);
+                }
+            }
+            returnstring.add(stringtemp);
+        }
+        return  returnstring;
     }
 
 

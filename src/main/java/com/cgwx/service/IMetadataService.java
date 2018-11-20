@@ -21,13 +21,12 @@ public interface IMetadataService {
     List<ThemeticProductSimpleInfo> getThemeticSimpleProductlist(Object geo, String producer);
     List<ThemeticProductSimpleInfo> testgetSimpleProductlist(int type);
     List<String> getProductIdlist(String clientname,String description);
-//    boolean Polygonintersect(Object geo1,Object geo2);
-//    List<SinglePoint> GeotoList(Object geo);
+    List<String> removeRepeat(List<String> stringList);
     void mergeThemeticSimpleInfoListByProductIdlist(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList, List<String>productIdlist);
     List<String> getProductIdlistFromIndustry(int level1,int level2);
     List<String> getProductIdlistByIndustryList( List<Industry> industryList);
     void printThemeticSimpleInfoList(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList);
-    List<ThemeticProductListByGeosResult> packetSingleThemeticProductToThemetic(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList);
+    List<ThemeticProductListByGeosResult> packetSingleThemeticProductToThemeticProduct(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList);
     List<Industry> getIndustryByProductid(String productId);
     List<AdvanceProductSimpleInfo> getAdvanceProductSimpleInfoList(String producer,Object image_geo,String clientName,String description);
 }
