@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmDomesticAreaInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmDomesticAreaInfo" >
+    <result column="area_id" property="areaId" jdbcType="INTEGER" />
+    <result column="parent_area_id" property="parentAreaId" jdbcType="INTEGER" />
+    <result column="area_name" property="areaName" jdbcType="VARCHAR" />
+    <result column="area_level" property="areaLevel" jdbcType="INTEGER" />
+    <result column="area_geo" property="areaGeo" jdbcType="OTHER" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmDomesticAreaInfo" >
+    insert into pdm_domestic_area_info (area_id, parent_area_id, area_name, 
+      area_level, area_geo)
+    values (#{areaId,jdbcType=INTEGER}, #{parentAreaId,jdbcType=INTEGER}, #{areaName,jdbcType=VARCHAR}, 
+      #{areaLevel,jdbcType=INTEGER}, #{areaGeo,jdbcType=OTHER})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select area_id, parent_area_id, area_name, area_level, area_geo
+    from pdm_domestic_area_info
+  </select>
+</mapper>
