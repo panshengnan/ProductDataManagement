@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public interface IProductArchiveService {              //
     List<String> getFileNameList(String productId);
     SecondaryFileStructure getSecondaryFileStructure(String path);
     void copyFolder(String oldPath, String newPath);
-    void copyFile(String oldPath, String newPath);
+    void copyFile(File source, File dest);
     UploadFileReturn uploadFile(MultipartFile file);
     String unZip(String fileName, String filePath);
     void zip(String srcFile, String dest, String passwd);
@@ -41,4 +42,8 @@ public interface IProductArchiveService {              //
     int updateThemeticProductDetailIndustry(PdmThemeticProductDetailIndustryInfo pdmThemeticProductDetailIndustryInfo);
     int updateThemeticProductDetail(PdmThemeticProductDetailInfo pdmThemeticProductDetailInfo);
     int updateThemeticProduct(PdmThemeticProductInfo pdmThemeticProductInfo);
+    int insertPdmProducerInfo(String producerName);
+    int selectCountByProducerName(String producerName);
+    int updatePdmProducerInfo(String producerName);
+
 }

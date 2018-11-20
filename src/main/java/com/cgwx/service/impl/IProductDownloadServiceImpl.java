@@ -125,7 +125,7 @@ public class IProductDownloadServiceImpl implements IProductDownloadService {
         return productLinkList;
     }
 
-    @Override/*只写了专题*/
+    @Override/*只写了专题heihei*/
     public int generateProductLink(int productType,String productId,String productName){
 
         switch (productType) {

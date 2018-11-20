@@ -14,6 +14,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,9 @@ public class ProductArchiveController {
     @Autowired
     LayerPublishService layerPublishService;
 
+    @Autowired
+    private AmqpTemplate amqpTemplate;
+
     @RequestMapping(value = "/test")
     @CrossOrigin(methods = RequestMethod.GET)
     @ResponseBody
@@ -53,9 +57,10 @@ public class ProductArchiveController {
 
 //       return ResultUtil.success(iProductArchiveService.getSecondaryFileStructure("C:\\Users\\37753\\Desktop\\tmpPic\\哈哈"));
 //        iProductArchiveService.copyFolder("C:\\Users\\37753\\Desktop\\产品管理后台\\pdm\\专题产品","C:\\Users\\37753\\Desktop\\产品管理后台\\pdm\\高级产品");
+        String content="打死啊是";
+        amqpTemplate.convertAndSend("publishOrder",content);
 
-
-        return ResultUtil.success(iProductArchiveService.getDeliverNameList(""));
+        return ResultUtil.success(content);
     }
 
     @RequestMapping("/downloadFile")//没用这个函数
@@ -89,7 +94,7 @@ public class ProductArchiveController {
 //    }
 
 
-    @RequestMapping(value = "/uploadThemeticProduct")
+    @RequestMapping(value = "/uploadThemeticProduct")//
     @CrossOrigin(methods = RequestMethod.POST)
     @ResponseBody
     public Result uploadThemeticProduct(@RequestParam(value = "file", required = true) MultipartFile file) throws Exception {
@@ -141,10 +146,17 @@ public class ProductArchiveController {
         }
         String tempPath = iProductArchiveService.getThemeticProductTemporaryPath(jsonObject.getString("tempId"));
         String officialPath = System.getProperty("user.dir") + "\\officialStorage\\专题产品\\" + productName;
+        String zipFilePath = tempPath+".zip";
+        String zipFileTargetPath = officialPath + "\\"+productName+".zip";
+        System.out.println("zip文件路径为："+zipFilePath);
+        System.out.println("zip文件目的路径为："+zipFileTargetPath);
         File file = new File(officialPath);
         if (!file.exists())
             file.mkdir();
         iProductArchiveService.copyFolder(tempPath, officialPath);
+        File zipFile = new File(zipFilePath);
+        File zipTargetFile = new File(zipFileTargetPath);
+        iProductArchiveService.copyFile(zipFile,zipTargetFile);
         JSONArray singlePeriodProductInfoJsonArray = jsonObject.getJSONArray("singlePeriodProductInfo");
         PdmThemeticProductDetailInfo pdmThemeticProductDetailInfo = new PdmThemeticProductDetailInfo();
         for (int i = 0; i < singlePeriodProductInfoJsonArray.size(); i++) {
@@ -156,6 +168,9 @@ public class ProductArchiveController {
                 System.out.println(pe.getMessage());
             }
             pdmThemeticProductDetailInfo.setProducer(jsonObjectTmp.getString("producer"));
+            //更新producer
+            iProductArchiveService.insertPdmProducerInfo(jsonObjectTmp.getString("producer"));
+            //
             String produceTime = jsonObjectTmp.getString("produceTime").replace("T", " ");
             try {
                 pdmThemeticProductDetailInfo.setProduceTime(dateFormat.parse(produceTime));
@@ -199,6 +214,7 @@ public class ProductArchiveController {
     public Result getProducerList(String producer) {
         return ResultUtil.success(iProductArchiveService.getProducerList(producer));
     }
+
 
 
 }
