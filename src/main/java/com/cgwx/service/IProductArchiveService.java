@@ -1,11 +1,9 @@
 package com.cgwx.service;
 
+import com.cgwx.data.dto.ArchivalRecordsItems;
 import com.cgwx.data.dto.SecondaryFileStructure;
 import com.cgwx.data.dto.UploadFileReturn;
-import com.cgwx.data.entity.PdmProductInfo;
-import com.cgwx.data.entity.PdmThemeticProductDetailIndustryInfo;
-import com.cgwx.data.entity.PdmThemeticProductDetailInfo;
-import com.cgwx.data.entity.PdmThemeticProductInfo;
+import com.cgwx.data.entity.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
@@ -28,6 +26,7 @@ public interface IProductArchiveService {              //
     String getNextProductId(int productType);
     List<String> getFileNameList(String productId);
     SecondaryFileStructure getSecondaryFileStructure(String path);
+    SecondaryFileStructure getSecondaryFileStructureAndWriteCheckTable(String path,String archivePersonnel,int type);
     void copyFolder(String oldPath, String newPath);
     void copyFile(File source, File dest);
     UploadFileReturn uploadFile(MultipartFile file);
@@ -45,5 +44,8 @@ public interface IProductArchiveService {              //
     int insertPdmProducerInfo(String producerName);
     int selectCountByProducerName(String producerName);
     int updatePdmProducerInfo(String producerName);
+    List<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel);
+    int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo,String tempId);
+    String getArchivePersonnelName(String archivePersonnel);
 
 }

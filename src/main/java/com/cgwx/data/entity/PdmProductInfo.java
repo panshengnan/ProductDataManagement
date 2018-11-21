@@ -19,6 +19,16 @@ public class PdmProductInfo {
 
     private String producer;
 
+    private String archivePersonnel;
+
+    public String getArchivePersonnel() {
+        return archivePersonnel;
+    }
+
+    public void setArchivePersonnel(String archivePersonnel) {
+        this.archivePersonnel = archivePersonnel;
+    }
+
     public String getProductId() {
         return productId;
     }

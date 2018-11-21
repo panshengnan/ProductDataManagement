@@ -2,11 +2,9 @@ package com.cgwx.controller;
 
 import com.cgwx.aop.result.Result;
 import com.cgwx.aop.result.ResultUtil;
+import com.cgwx.data.dto.ArchivalRecordsItems;
 import com.cgwx.data.dto.UploadFileReturn;
-import com.cgwx.data.entity.PdmProductInfo;
-import com.cgwx.data.entity.PdmThemeticProductDetailIndustryInfo;
-import com.cgwx.data.entity.PdmThemeticProductDetailInfo;
-import com.cgwx.data.entity.PdmThemeticProductInfo;
+import com.cgwx.data.entity.*;
 import com.cgwx.service.IProductArchiveService;
 import com.cgwx.service.IProductDownloadService;
 import com.cgwx.service.LayerPublishService;
@@ -26,6 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 @CrossOrigin
@@ -44,6 +45,7 @@ public class ProductArchiveController {
 
     @Autowired
     private AmqpTemplate amqpTemplate;
+
 
     @RequestMapping(value = "/test")
     @CrossOrigin(methods = RequestMethod.GET)
@@ -97,15 +99,16 @@ public class ProductArchiveController {
     @RequestMapping(value = "/uploadThemeticProduct")//
     @CrossOrigin(methods = RequestMethod.POST)
     @ResponseBody
-    public Result uploadThemeticProduct(@RequestParam(value = "file", required = true) MultipartFile file) throws Exception {
+    public Result uploadThemeticProduct(@RequestParam(value = "file", required = true) MultipartFile file,String archivePersonnel) throws Exception {
 
         System.out.print("收到专题产品上传请求！");
+        System.out.println("guidangrenshi:"+archivePersonnel);
         UploadFileReturn uploadFileReturn = iProductArchiveService.uploadFile(file);
         System.out.println(uploadFileReturn.getFileName());
         System.out.println(uploadFileReturn.getFilePath());
         String path = iProductArchiveService.unZip(uploadFileReturn.getFileName(), uploadFileReturn.getFilePath());
         System.out.println("解压后的路径是：" + path);
-        return ResultUtil.success(iProductArchiveService.getSecondaryFileStructure(path));
+        return ResultUtil.success(iProductArchiveService.getSecondaryFileStructureAndWriteCheckTable(path,archivePersonnel,1));
 
     }
 
@@ -191,7 +194,33 @@ public class ProductArchiveController {
         pdmThemeticProductInfo.setThemeticProductName(productName);
         iProductArchiveService.updateThemeticProduct(pdmThemeticProductInfo);
         iProductDownloadService.generateProductLink(1,productId,productName);
+        //
+        //操作一波归档记录表
+        PdmArchiveRecordsInfo pdmArchiveRecordsInfo = new PdmArchiveRecordsInfo();
+        pdmArchiveRecordsInfo.setArchiveResult(1);
+        pdmArchiveRecordsInfo.setProductId(productId);
+        iProductArchiveService.updateArchiveRecordsInfo(pdmArchiveRecordsInfo,jsonObject.getString("tempId"));
+        //操作一波归档记录表
         return ResultUtil.success("success");
+    }
+
+    @RequestMapping(value = "/getArchiveRecords")
+    @CrossOrigin(methods = RequestMethod.GET)
+    @ResponseBody
+    public Result getArchiveRecords(String archivePersonnel) {
+
+        System.out.println("归档id为:"+archivePersonnel);
+
+        List<PdmArchiveRecordsInfo> archiveRecordList = iProductArchiveService.getArchiveRecordList(archivePersonnel);
+        List<PdmArchiveRecordsInfo> archiveRecordListWithName = new ArrayList<PdmArchiveRecordsInfo>();
+
+        for(PdmArchiveRecordsInfo pdmArchiveRecordsInfo : archiveRecordList)
+        {
+            String archiverName = pdmArchiveRecordsInfo.getArchivePersonnel();
+            pdmArchiveRecordsInfo.setArchivePersonnel(iProductArchiveService.getArchivePersonnelName(archiverName));
+            archiveRecordListWithName.add(pdmArchiveRecordsInfo);  //注意一下有没有同一地址问题
+        }
+        return ResultUtil.success(archiveRecordListWithName);
     }
 
     @RequestMapping(value = "/getDeliverNameList")

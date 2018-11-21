@@ -1,6 +1,7 @@
 package com.cgwx.service.impl;
 
 import com.cgwx.dao.*;
+import com.cgwx.data.dto.ArchivalRecordsItems;
 import com.cgwx.data.dto.DirectoryInfo;
 import com.cgwx.data.dto.SecondaryFileStructure;
 import com.cgwx.data.dto.UploadFileReturn;
@@ -16,6 +17,7 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 import org.apache.commons.io.FileUtils;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,6 +77,13 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
 
     @Autowired
     PdmProducerInfoMapper pdmProducerInfoMapper;
+
+    @Autowired
+    PdmArchiveRecordsInfoMapper pdmArchiveRecordsInfoMapper;
+
+    @Autowired
+    PdmUserInfoMapper pdmUserInfoMapper;
+
 
     @Override/*上传文件*/
     public UploadFileReturn uploadFile(MultipartFile file) {
@@ -204,7 +213,6 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
 
     @Override
     public void updateXml(Document document, PdmThemeticProductInfo pdmThemeticProductInfo) {
-
 
         //取出这个元素
         Element element = document.createElement("productData");
@@ -348,7 +356,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     @Override/*获取专题多期产品中二级目录中的目录结构*/
-    public SecondaryFileStructure getSecondaryFileStructure(String path) {
+    public SecondaryFileStructure getSecondaryFileStructureAndWriteCheckTable(String path,String archivePersonnel,int type) {
 
         List<String> files = new ArrayList<String>();
         File file = new File(path);
@@ -391,7 +399,63 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         pdmArchiveCheckInfo.setTemporaryPath(path);
         pdmArchiveCheckInfo.setProductId(tempId);
         pdmArchiveCheckInfo.setFileName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveCheckInfo.setStatus(0);
         pdmArchiveCheckInfoMapper.insert(pdmArchiveCheckInfo);
+        //操作一波归档记录表
+        PdmArchiveRecordsInfo pdmArchiveRecordsInfo = new PdmArchiveRecordsInfo();
+        pdmArchiveRecordsInfo.setArchiveResult(0);
+        pdmArchiveRecordsInfo.setArchivePersonnel(archivePersonnel);
+        pdmArchiveRecordsInfo.setProductName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveRecordsInfo.setArchiveType(type);
+        pdmArchiveRecordsInfo.setProductId(tempId);
+        pdmArchiveRecordsInfo.setArchiveTime(new Date());
+        pdmArchiveRecordsInfoMapper.insert(pdmArchiveRecordsInfo);
+        System.out.println("路径是："+path.substring(path.lastIndexOf('\\')+1));
+        //操作一波归档记录表
+        return secondaryFileStructure;
+    }
+
+    @Override/*获取专题多期产品中二级目录中的目录结构*/
+    public SecondaryFileStructure getSecondaryFileStructure(String path) {
+
+        List<String> files = new ArrayList<String>();
+        File file = new File(path);
+        File[] tempList = file.listFiles();
+        SecondaryFileStructure secondaryFileStructure = new SecondaryFileStructure();
+        String tempId = getUUId();
+        secondaryFileStructure.setTempId(tempId);
+        List<DirectoryInfo> directoryInfoList = new ArrayList<DirectoryInfo>();
+        int count = 0;
+        for (int i = 0; i < tempList.length; i++) {
+            if (tempList[i].isFile()) {
+                String tmp = tempList[i].toString();
+                tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
+                System.out.println(tmp);
+                files.add(tmp);
+            }
+            if (tempList[i].isDirectory()) {
+                DirectoryInfo directoryInfo = new DirectoryInfo();
+                directoryInfo.setSingleTempId((count++)+"");
+                List<String> files2 = new ArrayList<String>();
+                String tmp = tempList[i].toString();
+                tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
+                directoryInfo.setDirectoryName(tmp);
+                System.out.println(tmp);
+                File[] tempList2 = tempList[i].listFiles();
+                for (int j = 0; j < tempList2.length; j++) {
+                    String tmp2 = tempList2[j].toString();
+                    tmp2 = tmp2.substring(tmp2.lastIndexOf('\\') + 1);
+                    System.out.println(tmp2);
+                    files2.add(tmp2);
+
+                }
+                directoryInfo.setFileListInDirectory(files2);
+                directoryInfoList.add(directoryInfo);
+            }
+        }
+        secondaryFileStructure.setFile(files);
+        secondaryFileStructure.setDirectory(directoryInfoList);
+
         return secondaryFileStructure;
     }
 
@@ -546,5 +610,24 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
             insertPdmProducerInfo(producerName);
         }
         return 1;
+    }
+
+    @Override
+    public List<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel){
+
+        return pdmArchiveRecordsInfoMapper.selectArchiveRecordsByArchivePersonnel(archivePersonnel);
+    }
+
+    @Override
+    public int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo,String tempId){
+
+        pdmArchiveRecordsInfoMapper.updateArchiveRecordsInfo(pdmArchiveRecordsInfo.getProductId(),pdmArchiveRecordsInfo.getArchiveResult(),tempId);
+        return 1;
+    }
+
+    @Override
+    public String getArchivePersonnelName(String archivePersonnel){
+
+        return pdmUserInfoMapper.selectUserNameByUserId(archivePersonnel);
     }
 }

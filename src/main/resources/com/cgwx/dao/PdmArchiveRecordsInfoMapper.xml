@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmArchiveRecordsInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmArchiveRecordsInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="product_name" property="productName" jdbcType="VARCHAR" />
+    <result column="archive_time" property="archiveTime" jdbcType="TIMESTAMP" />
+    <result column="archive_type" property="archiveType" jdbcType="INTEGER" />
+    <result column="archive_personnel" property="archivePersonnel" jdbcType="VARCHAR" />
+    <result column="archive_result" property="archiveResult" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmArchiveRecordsInfo" >
+    insert into pdm_archive_records_info (product_id, product_name, archive_time, 
+      archive_type, archive_personnel, archive_result
+      )
+    values (#{productId,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{archiveTime,jdbcType=TIMESTAMP}, 
+      #{archiveType,jdbcType=INTEGER}, #{archivePersonnel,jdbcType=VARCHAR}, #{archiveResult,jdbcType=INTEGER}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, product_name, archive_time, archive_type, archive_personnel, archive_result
+    from pdm_archive_records_info
+  </select>
+</mapper>

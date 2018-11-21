@@ -5,6 +5,7 @@
 
 package com.cgwx.dao;
 
+import com.cgwx.data.dto.ArchivalRecordsItems;
 import com.cgwx.data.dto.ProductQueryList;
 import com.cgwx.data.entity.PdmProductInfo;
 import org.apache.ibatis.annotations.*;
@@ -213,4 +214,7 @@ public interface PdmProductInfoMapper {
             +"</script>")
 
     String getProductNameById(@Param("product_id")String productId);
+
+
+//    List<ArchivalRecordsItems> selectArchivalRecordsItemsList(@Param("archivePersonnel") String archivePersonnel);
 }
