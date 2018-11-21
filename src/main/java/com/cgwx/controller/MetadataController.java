@@ -4,18 +4,22 @@ package com.cgwx.controller;
 import com.cgwx.aop.result.Result;
 import com.cgwx.aop.result.ResultUtil;
 import com.cgwx.dao.PdmProductInfoMapper;
+import com.cgwx.dao.PdmProductStoreLinkInfoMapper;
 import com.cgwx.dao.PdmProductTypeInfoMapper;
 import com.cgwx.dao.PdmThemeticProductDetailInfoMapper;
 import com.cgwx.data.dto.*;
 import com.cgwx.service.IMetadataService;
 import com.cgwx.service.impl.IProductArchiveServiceImpl;
 import com.github.pagehelper.PageHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
+
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +38,10 @@ public class MetadataController
     PdmProductTypeInfoMapper pdmProductTypeInfoMapper;
     @Autowired
     IProductArchiveServiceImpl iProductArchiveService;
-
+    @Autowired
+    PdmProductStoreLinkInfoMapper pdmProductStoreLinkInfoMapper;
+    @Value("${productStoreLinkHead}")
+    private String productStoreLinkHead;//拼链接
 
 
     @RequestMapping(value = "/themeticProductDetail")  //专题产品详情
@@ -349,6 +356,7 @@ public class MetadataController
         JSONObject jsonObject = JSONObject.fromObject(json);
         if(jsonObject.getString("client_name").equals(""))
         {
+            System.out.println("clientnamenull");
             clientname=null;
         }
         else
@@ -382,11 +390,44 @@ public class MetadataController
     @CrossOrigin(methods = RequestMethod.GET)
     @ResponseBody
     public Result getAllClientList( ) {
-        System.out.println(iProductArchiveService.getClientNameList(""));
+       // System.out.println(iProductArchiveService.getClientNameList(""));
         List<String> clientlist=iProductArchiveService.getClientNameList("");
         clientlist=metadataService.removeRepeat(clientlist);
-        System.out.println(clientlist);
+        for(int i=0;i<clientlist.size();i++)
+        {
+            if(clientlist.get(i).equals(""))
+            {
+                clientlist.remove(i);
+            }
+        }
+       // System.out.println(clientlist);
         return ResultUtil.success(clientlist);
+    }
+
+    @RequestMapping(value = "/producerlist")  //产品列表
+    @CrossOrigin(methods = RequestMethod.GET)
+    @ResponseBody
+    public Result getAllProducerList( ) {
+        //System.out.println(iProductArchiveService.getProducerList(""));
+        List<String> producerList=iProductArchiveService.getProducerList("");
+        producerList=metadataService.removeRepeat(producerList);
+        for(int i=0;i<producerList.size();i++)
+        {
+            if(producerList.get(i).equals(""))
+            {
+                producerList.remove(i);
+            }
+        }
+        //System.out.println(producerList);
+        return ResultUtil.success(producerList);
+    }
+    @RequestMapping(value = "/allFileDownloadUrl")  //产品列表
+    @CrossOrigin(methods = RequestMethod.GET)
+    @ResponseBody
+    public Result getAllFielDownloadurl( @RequestParam(value = "productId", required = true) String productId) {
+        //System.out.println(iProductArchiveService.getProducerList(""));
+       String url=productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(productId);
+       return ResultUtil.success(url);
     }
 }
 

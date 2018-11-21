@@ -25,4 +25,10 @@ public class AreaInfoController {
         return ResultUtil.success(AreaDtoList);
 
     }
+    @RequestMapping(value = "/countrylist")  //产品列表
+    @CrossOrigin(methods = RequestMethod.GET)
+    @ResponseBody
+    public Result getAllProducerList( ) {
+        return ResultUtil.success(areaService.getCountryList());
+    }
 }

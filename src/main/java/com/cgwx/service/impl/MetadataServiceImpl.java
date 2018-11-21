@@ -6,6 +6,7 @@ import com.cgwx.data.entity.*;
 import com.cgwx.service.IMetadataService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,6 +41,11 @@ public class MetadataServiceImpl implements IMetadataService {
 
     @Autowired
     IProductDownloadServiceImpl iProductDownloadService;
+    @Autowired
+    PdmProductStoreLinkInfoMapper pdmProductStoreLinkInfoMapper;
+
+    @Value("${productStoreLinkHead}")
+    private String productStoreLinkHead;//拼链接
 
     @Override
    //単期产品详情
@@ -50,7 +56,15 @@ public class MetadataServiceImpl implements IMetadataService {
         SinglePeriodThemeticProductDetail singlePeriodThemeticProductDetail =new SinglePeriodThemeticProductDetail();
         singlePeriodThemeticProductDetail.setSinglePeriodProductId(singlePeriodProductId);
         //System.err.print(" "+themeticProductDetailPart2.getProducer());
-        singlePeriodThemeticProductDetail.setImageGeo(themeticProductDetailPart2.getImageGeo().toString());
+        if(themeticProductDetailPart2.getImageGeo()==null)
+        {
+            singlePeriodThemeticProductDetail.setImageGeo(null);
+        }
+        else
+        {
+            singlePeriodThemeticProductDetail.setImageGeo(themeticProductDetailPart2.getImageGeo().toString());
+        }
+
         singlePeriodThemeticProductDetail.setProducer(themeticProductDetailPart2.getProducer());
         singlePeriodThemeticProductDetail.setSatellite(themeticProductDetailPart2.getSatellite());
         singlePeriodThemeticProductDetail.setSensor(themeticProductDetailPart2.getSensor());
@@ -84,17 +98,21 @@ public class MetadataServiceImpl implements IMetadataService {
         //获取文件列表和对应的URL
         String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\1";
         List<FileUrl> themeticUrlList = getFileListAndUrl(productId,singlePeriodProductId);
-        singlePeriodThemeticProductDetail.setFileListAndUrl(themeticUrlList);
-        for(int a=0;a<themeticUrlList.size();a++) {
+
+        for(int a=themeticUrlList.size()-1;a>=0;a--) {
             if(themeticUrlList.get(a).getFileName().contains("jpg"))
             {
                 System.out.println("removejpg"+themeticUrlList.get(a).getFileName());
                 singlePeriodThemeticProductDetail.setThumbnailUrl(themeticUrlList.get(a).getFileUrl());
                 themeticUrlList.remove(a);
-                break;
             }
-        }
+            else
+            {
+                themeticUrlList.get(a).setFileUrl(productStoreLinkHead+themeticUrlList.get(a).getFileUrl());
+            }
 
+        }
+        singlePeriodThemeticProductDetail.setFileListAndUrl(themeticUrlList);
         return singlePeriodThemeticProductDetail;
     }
 
@@ -143,11 +161,11 @@ public class MetadataServiceImpl implements IMetadataService {
         themeticProductDetail.setDelieverTime(themeticProductDetailPart1.getDelieverTime());
         //获取分析报告路径
         //String parentDirect=iProductDownloadService.getEntityFilePath(productId);
-        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-        themeticProductDetail.setAnalysisReportUrl(path1);
+       // String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
+        themeticProductDetail.setAnalysisReportUrl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAnalysisReporturl(productId));
         //获取全部文件URL
-        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        themeticProductDetail.setAllFileDownloadUrl(path4);
+       // String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+        themeticProductDetail.setAllFileDownloadUrl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(productId));
         Integer size=pdmThemeticProductDetailInfoMapper.countSinglePeriodThemeticProductId(productId);
        // System.err.println("size"+size);
         List<SinglePeriodThemeticProductDetail> list =new ArrayList<>();
@@ -676,6 +694,7 @@ public class MetadataServiceImpl implements IMetadataService {
         List<AdvanceProductSimpleInfo> advanceProductSimpleInfoListtemp1=new ArrayList<AdvanceProductSimpleInfo>();
         List<AdvanceProductSimpleInfo> advanceProductSimpleInfoListtemp2=new ArrayList<AdvanceProductSimpleInfo>();
         advanceProductSimpleInfoList=pdmOrthoProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
+        System.out.println(advanceProductSimpleInfoList);
         advanceProductSimpleInfoListtemp1=pdmInlayProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
         for (int i=0;i<advanceProductSimpleInfoListtemp1.size();i++)
         {
