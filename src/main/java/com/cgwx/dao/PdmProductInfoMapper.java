@@ -18,10 +18,10 @@ public interface PdmProductInfoMapper {
 
     List<PdmProductInfo> selectAll();
 
-    @Select({"SELECT client_name\nFROM pdm_product_info\nWHERE client_name like  '%${clientName}%' order by client_name collate \"C\" "})
+    @Select({"SELECT distinct client_name\nFROM pdm_product_info\nWHERE client_name like  '%${clientName}%'  "})
     List<String> selectClientNameList(@Param("clientName") String var1);
 
-    @Select({"SELECT deliver_name\nFROM pdm_product_info\nWHERE deliver_name like  '%${deliverName}%' order by deliver_name collate \"C\" "})
+    @Select({"SELECT distinct deliver_name\nFROM pdm_product_info\nWHERE deliver_name like  '%${deliverName}%'  "})
     List<String> selectDeliverNameList(@Param("deliverName") String var1);
 
     @Select({"SELECT producer\nFROM pdm_product_info\nWHERE producer like  '%${producer}%' order by producer collate \"C\" "})

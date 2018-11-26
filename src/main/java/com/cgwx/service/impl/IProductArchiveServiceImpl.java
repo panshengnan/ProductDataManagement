@@ -122,7 +122,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         try {
             File zipFile = new File(source);
             ZipFile zFile = new ZipFile(zipFile);
-//            zFile.setFileNameCharset("GBK");
+//            zFile.setFileNameCharset("GBK32");
             zFile.setFileNameCharset("UTF-8");
             File destDir = new File(dest);     // 解压目录
             if (zFile.isEncrypted()) {
@@ -366,6 +366,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         secondaryFileStructure.setTempId(tempId);
         List<DirectoryInfo> directoryInfoList = new ArrayList<DirectoryInfo>();
         int count = 0;
+        if(tempList!=null)
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {
                 String tmp = tempList[i].toString();

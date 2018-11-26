@@ -1,5 +1,6 @@
 package com.cgwx.service.impl;
 
+
 import com.cgwx.aop.result.Result;
 import com.cgwx.aop.result.ResultUtil;
 import com.cgwx.common.constants.LayerInfo;
@@ -15,6 +16,12 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.data.FileDataStore;
+import org.geotools.data.FileDataStoreFinder;
+
+import org.geotools.data.shapefile.ShapefileDataStore;////
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.jts.JTS;
@@ -32,6 +39,8 @@ import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import org.opengis.filter.Filter;
 
 
 @Service
@@ -151,5 +160,39 @@ public class LayerPublishServiceImpl implements LayerPublishService
 
     }
 
+    @Override
+    public SimpleFeatureCollection readShp(String path ){
+        return readShp(path, null);
 
+    }
+
+     SimpleFeatureCollection  readShp(String path ,Filter filter){
+        SimpleFeatureSource featureSource = readStoreByShp(path);
+        if(featureSource == null) return null;
+        try {
+            return filter != null ? featureSource.getFeatures(filter) : featureSource.getFeatures() ;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null ;
+    }
+
+     SimpleFeatureSource readStoreByShp(String path ){
+        File file = new File(path);
+        FileDataStore store;
+        SimpleFeatureSource featureSource = null;
+        try {
+            store = FileDataStoreFinder.getDataStore(file);
+            ((ShapefileDataStore) store).setStringCharset(Charset.forName("GBK"));
+            System.out.println(Charset.forName("UTF-8"));
+            featureSource = store.getFeatureSource();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return featureSource ;
+    }
 }
+
+
+
+

@@ -10,6 +10,9 @@ import com.cgwx.service.IProductDownloadService;
 import com.cgwx.service.LayerPublishService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +49,8 @@ public class ProductArchiveController {
 
     @Autowired
     private AmqpTemplate amqpTemplate;
+
+
 
 
     @RequestMapping(value = "/test")
@@ -244,6 +250,63 @@ public class ProductArchiveController {
         return ResultUtil.success(iProductArchiveService.getProducerList(producer));
     }
 
+    @RequestMapping(value = "/readShpTest")/**/
+    @CrossOrigin(methods = RequestMethod.GET)
+    @ResponseBody
+    public Result readShpTest() {
 
+        String path1 = "D:\\样例数据-高级产品管理系统\\分幅产品\\title_K51E007021_cutline.shp";
+        //读取shp
+        SimpleFeatureCollection colls1 = layerPublishService.readShp(path1);
+        //拿到所有features
+        SimpleFeatureIterator iters = colls1.features();
+        //遍历打印
+        List<JSONObject> jSONObjects = new ArrayList<JSONObject>();
+        while (iters.hasNext()) {
+            SimpleFeature sf = iters.next();
+            System.out.println(sf.getID() + " , " + sf.getAttributes());
+//            System.out.println(sf.getAttribute("ImageFile"));
+//            System.out.println(sf.getFeatureType());
+//            System.out.println(sf.getProperties());
+            System.out.println("名字是"+sf.getName());
+            String[] strList = (sf.getProperties()).toString().split("SimpleFeatureImpl.Attribute");
+//            System.out.println("分割结果：");
+            JSONObject jsonObject = new JSONObject();
+            for (int i = 0; i < strList.length; i++) {
+                String tmp = strList[i];
+//                System.out.println("原串是："+tmp);
+                String key="";
+                String value="";
+                if(i>0&&i<strList.length-1)
+                {
+                    key = tmp.substring(2, tmp.indexOf('<'));
+                    System.out.println("key是：" + key);
+                    String comma = ",";
+
+                    if(comma.equals((tmp.charAt(tmp.length()-1))))
+                    value="";
+                    else
+                    value = tmp.substring(tmp.lastIndexOf('=') + 1,tmp.lastIndexOf(','));
+                    System.out.println("value是：" + value);
+                }
+                if(i==strList.length-1)
+                {
+                    {
+                        key = tmp.substring(2, tmp.indexOf('<'));
+                        System.out.println("key是：" + key);
+                        value = tmp.substring(tmp.lastIndexOf('=') + 1,tmp.lastIndexOf(']'));
+                        System.out.println("value是：" + value);
+                    }
+
+                }
+                if(i!=0)
+                jsonObject.put(key,value);
+            }
+            jSONObjects.add(jsonObject);
+            System.out.println("json为："+jsonObject);
+        }
+            return ResultUtil.success(jSONObjects);
+
+    }
 
 }
