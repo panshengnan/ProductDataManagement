@@ -209,4 +209,22 @@ public interface PdmThemeticProductDetailInfoMapper {
             property = "singlePeriodId")
     })
     List<ThemeticProductSimpleInfo> selectSimpleinfotest();
+
+
+    @Select({"SELECT product_id,st_asgeojson(image_geo) as geo,single_period_product_id\n" +
+            "            FROM pdm_themetic_product_detail_info\n"+
+            "            WHERE product_id=#{productId}"
+    })
+    @Results({@Result(
+            column = "geo",
+            property = "imageGeo"
+
+    ), @Result(
+            column = "product_id",
+            property = "productId"
+    ), @Result(
+            column = "single_period_product_id",
+            property = "singlePeriodId")
+    })
+    List<ThemeticProductSimpleInfo> selectSimpleinfoById(@Param("productId")String productId);
 }

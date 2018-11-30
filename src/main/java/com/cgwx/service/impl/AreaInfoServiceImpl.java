@@ -13,12 +13,12 @@ import java.util.List;
 public class AreaInfoServiceImpl implements IAreaInfoService {
 
     @Autowired
-    PdmDomesticAreaInfoMapper PdmDomesticAreaInfoMapper;
+    PdmDomesticAreaInfoMapper pdmDomesticAreaInfoMapper;
     @Autowired
     PdmCountryAreaInfoMapper pdmCountryAreaInfoMapper;
     @Override
     public List<AreaInfoDto> getAreaListByParentId(Integer parentId) throws IOException {
-        return PdmDomesticAreaInfoMapper.selectAllChild(parentId);
+        return pdmDomesticAreaInfoMapper.selectAllChild(parentId);
     }
     @Override
     public List<CountryInfo> getCountryList()

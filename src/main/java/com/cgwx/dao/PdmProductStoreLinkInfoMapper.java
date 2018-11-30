@@ -52,6 +52,11 @@ public interface PdmProductStoreLinkInfoMapper {
     String selectProductAnalysisReporturl(@Param("productId") String var1);
 
     @Select({"SELECT  store_link\n                       FROM pdm_product_store_link_info\n               WHERE product_id = #{productId} and file_name like '%.zip'"})
-
     String selectProductAllfileDownloadurl(@Param("productId") String var1);
+
+    @Select({"SELECT  store_link\n                       FROM pdm_product_store_link_info\n               WHERE product_id = #{productId} and (file_name like '%.doc' or file_name like '%.docx')"})
+    String selectProductDocAnalysisReporturl(@Param("productId") String var1);
+
+    @Select({"SELECT  store_link\n                       FROM pdm_product_store_link_info\n               WHERE product_id = #{productId} and file_name like '%.jpg'"})
+    List<String> selectProductthumbnailUrlurl(@Param("productId") String var1);
 }

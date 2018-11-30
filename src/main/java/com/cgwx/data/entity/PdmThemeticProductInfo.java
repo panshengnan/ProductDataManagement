@@ -15,9 +15,9 @@ public class PdmThemeticProductInfo {
 
     private String clientName;
 
-    private String delieverName;
+    private String deliverName;
 
-    private Date delieverTime;
+    private Date deliverTime;
 
     public String getProductId() {
         return productId;
@@ -67,19 +67,19 @@ public class PdmThemeticProductInfo {
         this.clientName = clientName == null ? null : clientName.trim();
     }
 
-    public String getDelieverName() {
-        return delieverName;
+    public String getDeliverName() {
+        return deliverName;
     }
 
-    public void setDelieverName(String delieverName) {
-        this.delieverName = delieverName == null ? null : delieverName.trim();
+    public void setDeliverName(String deliverName) {
+        this.deliverName = deliverName == null ? null : deliverName.trim();
     }
 
-    public Date getDelieverTime() {
-        return delieverTime;
+    public Date getDeliverTime() {
+        return deliverTime;
     }
 
-    public void setDelieverTime(Date delieverTime) {
-        this.delieverTime = delieverTime;
+    public void setDeliverTime(Date deliverTime) {
+        this.deliverTime = deliverTime;
     }
 }

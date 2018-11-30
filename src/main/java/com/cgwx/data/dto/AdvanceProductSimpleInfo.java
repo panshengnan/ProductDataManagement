@@ -2,9 +2,46 @@ package com.cgwx.data.dto;
 
 public class AdvanceProductSimpleInfo {
 
-    String productId;
-    Object imageGeo;
-    String productName;
+    private String productId;
+    private Object imageGeo;
+    private String productName;
+    private String thumbnailUrl;
+    private String thumbUrl;
+
+    public String getThumbUrl() {
+        return thumbUrl;
+    }
+
+    public void setThumbUrl(String thumbUrl) {
+        this.thumbUrl = thumbUrl;
+    }
+
+    String downloadurl;
+    String productType;
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
+
+    public void setDownloadurl(String downloadurl) {
+        this.downloadurl = downloadurl;
+    }
+
+    public String getDownloadurl() {
+        return downloadurl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
 
     public void setProductName(String productName) {
         this.productName = productName;

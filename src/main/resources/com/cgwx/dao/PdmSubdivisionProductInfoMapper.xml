@@ -3,15 +3,15 @@
 <mapper namespace="com.cgwx.dao.PdmSubdivisionProductInfoMapper" >
   <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmSubdivisionProductInfo" >
     <result column="product_id" property="productId" jdbcType="VARCHAR" />
-    <result column="subdivision_product_name" property="subdivisionProductName" jdbcType="VARCHAR" />
+    <result column="subdivision_product_name" property="productName" jdbcType="VARCHAR" />
     <result column="image_geo" property="imageGeo" jdbcType="OTHER" />
     <result column="subdivision_product_directory" property="subdivisionProductDirectory" jdbcType="VARCHAR" />
     <result column="number_of_tif" property="numberOfTif" jdbcType="INTEGER" />
     <result column="industry" property="industry" jdbcType="VARCHAR" />
     <result column="producer" property="producer" jdbcType="VARCHAR" />
     <result column="client_name" property="clientName" jdbcType="VARCHAR" />
-    <result column="deliever_name" property="delieverName" jdbcType="VARCHAR" />
-    <result column="deliever_time" property="delieverTime" jdbcType="VARCHAR" />
+    <result column="deliever_name" property="deliverName" jdbcType="VARCHAR" />
+    <result column="deliever_time" property="deliverTime" jdbcType="VARCHAR" />
     <result column="resolution" property="resolution" jdbcType="NUMERIC" />
     <result column="geographic_info" property="geographicInfo" jdbcType="VARCHAR" />
   </resultMap>
@@ -21,10 +21,10 @@
       industry, producer, client_name, 
       deliever_name, deliever_time, resolution, 
       geographic_info)
-    values (#{productId,jdbcType=VARCHAR}, #{subdivisionProductName,jdbcType=VARCHAR}, 
+    values (#{productId,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR},
       #{imageGeo,jdbcType=OTHER}, #{subdivisionProductDirectory,jdbcType=VARCHAR}, #{numberOfTif,jdbcType=INTEGER}, 
       #{industry,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, 
-      #{delieverName,jdbcType=VARCHAR}, #{delieverTime,jdbcType=VARCHAR}, #{resolution,jdbcType=NUMERIC}, 
+      #{deliverName,jdbcType=VARCHAR}, #{deliverTime,jdbcType=VARCHAR}, #{resolution,jdbcType=NUMERIC},
       #{geographicInfo,jdbcType=VARCHAR})
   </insert>
   <select id="selectAll" resultMap="BaseResultMap" >

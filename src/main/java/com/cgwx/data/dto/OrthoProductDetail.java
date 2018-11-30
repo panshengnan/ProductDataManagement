@@ -1,12 +1,13 @@
 package com.cgwx.data.dto;
 
+import java.util.Date;
 import java.util.List;
 
 public class OrthoProductDetail {
 
         private String productId;
 
-        private String orthoProductName;
+        private String productName;
 
         private String imageGeo;
 
@@ -20,21 +21,21 @@ public class OrthoProductDetail {
 
         private String sensor;
 
-        private String resolution;
-
-        private String imageBreath;
-
-        private String captureTime;
-
-        private String sizeOfTif;
+//        private String resolution;
+//
+//        private String imageBreath;
+//
+//        private String captureTime;
+//
+//        private String sizeOfTif;
 
         private String clientName;
 
         private String delieverName;
 
-        private String delieverTime;
+        private Date delieverTime;
 
-        private String analysisReportUrl;
+        //private String analysisReportUrl;
 
         private String thumbnailUrl;
 
@@ -43,6 +44,155 @@ public class OrthoProductDetail {
         private List<FileUrl> fileListAndUrl;
 
         private String productType;
+        private String receiveStation;
+        private Date centerTime;
+        private String swingSatelliteAngle;
+        private Date receiveTime;
+        private float cloudPercent;
+        private Double widthInMeters;
+        private Double heightInMeters;
+        private String productQuality;
+        private String bands;
+        private Double centerLongitude;
+        private Double centerLatitude;
+        private String produceArea;
+        private Date produceTime;
+        private String deliverMethod;
+    private String layerName;
+
+    public String getLayerName() {
+        return layerName;
+    }
+
+    public void setLayerName(String layerName) {
+        this.layerName = layerName;
+    }
+
+    public String getReceiveStation() {
+        return receiveStation;
+    }
+
+    public void setReceiveStation(String receiveStation) {
+        this.receiveStation = receiveStation;
+    }
+
+    public Date getCenterTime() {
+        return centerTime;
+    }
+
+    public void setCenterTime(Date centerTime) {
+        this.centerTime = centerTime;
+    }
+
+    public String getSwingSatelliteAngle() {
+        return swingSatelliteAngle;
+    }
+
+    public void setSwingSatelliteAngle(String swingSatelliteAngle) {
+        this.swingSatelliteAngle = swingSatelliteAngle;
+    }
+
+    public Date getReceiveTime() {
+        return receiveTime;
+    }
+
+    public void setReceiveTime(Date receiveTime) {
+        this.receiveTime = receiveTime;
+    }
+
+    public float getCloudPercent() {
+        return cloudPercent;
+    }
+
+    public void setCloudPercent(float cloudPercent) {
+        this.cloudPercent = cloudPercent;
+    }
+
+
+
+    public String getProductQuality() {
+        return productQuality;
+    }
+
+    public void setProductQuality(String productQuality) {
+        this.productQuality = productQuality;
+    }
+
+    public String getBands() {
+        return bands;
+    }
+
+    public void setBands(String bands) {
+        this.bands = bands;
+    }
+
+    public Double getWidthInMeters() {
+        return widthInMeters;
+    }
+
+    public void setWidthInMeters(Double widthInMeters) {
+        this.widthInMeters = widthInMeters;
+    }
+
+    public Double getHeightInMeters() {
+        return heightInMeters;
+    }
+
+    public void setHeightInMeters(Double heightInMeters) {
+        this.heightInMeters = heightInMeters;
+    }
+
+    public Double getCenterLongitude() {
+        return centerLongitude;
+    }
+
+    public void setCenterLongitude(Double centerLongitude) {
+        this.centerLongitude = centerLongitude;
+    }
+
+    public Double getCenterLatitude() {
+        return centerLatitude;
+    }
+
+    public void setCenterLatitude(Double centerLatitude) {
+        this.centerLatitude = centerLatitude;
+    }
+
+    public String getProduceArea() {
+        return produceArea;
+    }
+
+    public void setProduceArea(String produceArea) {
+        this.produceArea = produceArea;
+    }
+
+    public Date getProduceTime() {
+        return produceTime;
+    }
+
+    public void setProduceTime(Date produceTime) {
+        this.produceTime = produceTime;
+    }
+
+    public String getDeliverMethod() {
+        return deliverMethod;
+    }
+
+    public void setDeliverMethod(String deliverMethod) {
+        this.deliverMethod = deliverMethod;
+    }
+
+
+
+    public void setDelieverTime(Date delieverTime) {
+        this.delieverTime = delieverTime;
+    }
+
+    public Date getDelieverTime() {
+        return delieverTime;
+    }
+
+
 
         public String getProductId() {
             return productId;
@@ -52,12 +202,12 @@ public class OrthoProductDetail {
             this.productId = productId == null ? null : productId.trim();
         }
 
-        public String getOrthoProductName() {
-            return orthoProductName;
+        public String getProductName() {
+            return productName;
         }
 
-        public void setOrthoProductName(String orthoProductName) {
-            this.orthoProductName = orthoProductName == null ? null : orthoProductName.trim();
+        public void setProductName(String productName) {
+            this.productName = productName == null ? null : productName.trim();
         }
 
         public String getImageGeo() {
@@ -108,37 +258,37 @@ public class OrthoProductDetail {
             this.sensor = sensor == null ? null : sensor.trim();
         }
 
-        public String getResolution() {
-            return resolution;
-        }
-
-        public void setResolution(String  resolution) {
-            this.resolution = resolution;
-        }
-
-        public String getImageBreath() {
-            return imageBreath;
-        }
-
-        public void setImageBreath(String imageBreath) {
-            this.imageBreath = imageBreath == null ? null : imageBreath.trim();
-        }
-
-        public String getCaptureTime() {
-            return captureTime;
-        }
-
-        public void setCaptureTime(String captureTime) {
-            this.captureTime = captureTime;
-        }
-
-        public String getSizeOfTif() {
-            return sizeOfTif;
-        }
-
-        public void setSizeOfTif(String sizeOfTif) {
-            this.sizeOfTif = sizeOfTif == null ? null : sizeOfTif.trim();
-        }
+//        public String getResolution() {
+//            return resolution;
+//        }
+//
+//        public void setResolution(String  resolution) {
+//            this.resolution = resolution;
+//        }
+//
+//        public String getImageBreath() {
+//            return imageBreath;
+//        }
+//
+//        public void setImageBreath(String imageBreath) {
+//            this.imageBreath = imageBreath == null ? null : imageBreath.trim();
+//        }
+//
+//        public String getCaptureTime() {
+//            return captureTime;
+//        }
+//
+//        public void setCaptureTime(String captureTime) {
+//            this.captureTime = captureTime;
+//        }
+//
+//        public String getSizeOfTif() {
+//            return sizeOfTif;
+//        }
+//
+//        public void setSizeOfTif(String sizeOfTif) {
+//            this.sizeOfTif = sizeOfTif == null ? null : sizeOfTif.trim();
+//        }
 
         public String getClientName() {
             return clientName;
@@ -156,21 +306,15 @@ public class OrthoProductDetail {
             this.delieverName = delieverName == null ? null : delieverName.trim();
         }
 
-        public String getDelieverTime() {
-            return delieverTime;
-        }
 
-        public void setDelieverTime(String delieverTime) {
-            this.delieverTime = delieverTime == null ? null : delieverTime.trim();
-        }
 
-        public String getAnalysisReportUrl(){
-            return analysisReportUrl;
-        }
-        public void setAnalysisReportUrl(String analysisReportUrl){
-            this.analysisReportUrl = analysisReportUrl == null ? null : analysisReportUrl.trim();
-
-        }
+//        public String getAnalysisReportUrl(){
+//            return analysisReportUrl;
+//        }
+//        public void setAnalysisReportUrl(String analysisReportUrl){
+//            this.analysisReportUrl = analysisReportUrl == null ? null : analysisReportUrl.trim();
+//
+//        }
 
         public String getThumbnailUrl(){
             return thumbnailUrl;

@@ -3,25 +3,25 @@
 <mapper namespace="com.cgwx.dao.PdmInlayProductInfoMapper" >
   <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmInlayProductInfo" >
     <result column="product_id" property="productId" jdbcType="VARCHAR" />
-    <result column="inlay_product_name" property="inlayProductName" jdbcType="VARCHAR" />
+    <result column="inlay_product_name" property="productName" jdbcType="VARCHAR" />
     <result column="image_geo" property="imageGeo" jdbcType="OTHER" />
     <result column="inlay_product_directory" property="inlayProductDirectory" jdbcType="VARCHAR" />
     <result column="producer" property="producer" jdbcType="VARCHAR" />
     <result column="geographic_info" property="geographicInfo" jdbcType="VARCHAR" />
     <result column="size_of_tif" property="sizeOfTif" jdbcType="VARCHAR" />
     <result column="client_name" property="clientName" jdbcType="VARCHAR" />
-    <result column="deliever_name" property="delieverName" jdbcType="VARCHAR" />
-    <result column="deliever_time" property="delieverTime" jdbcType="VARCHAR" />
+    <result column="deliever_name" property="deliverName" jdbcType="VARCHAR" />
+    <result column="deliever_time" property="deliverTime" jdbcType="VARCHAR" />
   </resultMap>
   <insert id="insert" parameterType="com.cgwx.data.entity.PdmInlayProductInfo" >
     insert into pdm_inlay_product_info (product_id, inlay_product_name, image_geo, 
       inlay_product_directory, producer, geographic_info, 
       size_of_tif, client_name, deliever_name, 
       deliever_time)
-    values (#{productId,jdbcType=VARCHAR}, #{inlayProductName,jdbcType=VARCHAR}, #{imageGeo,jdbcType=OTHER}, 
+    values (#{productId,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{imageGeo,jdbcType=OTHER},
       #{inlayProductDirectory,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, #{geographicInfo,jdbcType=VARCHAR}, 
-      #{sizeOfTif,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, #{delieverName,jdbcType=VARCHAR}, 
-      #{delieverTime,jdbcType=VARCHAR})
+      #{sizeOfTif,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, #{deliverName,jdbcType=VARCHAR},
+      #{deliverTime,jdbcType=VARCHAR})
   </insert>
   <select id="selectAll" resultMap="BaseResultMap" >
     select product_id, inlay_product_name, image_geo, inlay_product_directory, producer, 

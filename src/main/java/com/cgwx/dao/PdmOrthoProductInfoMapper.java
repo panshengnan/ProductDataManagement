@@ -1,24 +1,21 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.cgwx.dao;
 
 import com.cgwx.data.dto.AdvanceProductSimpleInfo;
+import com.cgwx.data.dto.OrthoProductDetail;
 import com.cgwx.data.dto.OrthoProductList;
 import com.cgwx.data.dto.ThemeticProductSimpleInfo;
 import com.cgwx.data.entity.PdmOrthoProductInfo;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
-
 @Mapper
 public interface PdmOrthoProductInfoMapper {
-    int insert(PdmOrthoProductInfo var1);
+    int insert(PdmOrthoProductInfo record);
 
     List<PdmOrthoProductInfo> selectAll();
+
 
     @Select({"SELECT count(DISTINCT ortho.product_id) as count\n                \n            FROM pdm_ortho_product_info ortho  \n            WHERE ortho.gmt_created >=  '${currentDate}'"})
     int selectOrthoProductCountByDate(@Param("currentDate") String var1);
@@ -26,10 +23,12 @@ public interface PdmOrthoProductInfoMapper {
     @Select({"SELECT ortho_product_directory\nFROM pdm_ortho_product_info \nWHERE  product_id = #{productId}"})
     String selectFilePathByProductId(@Param("productId") String var1);
     @Select({"SELECT product_id,ortho_product_name,\n" +
-            "        st_asgeojson(image_geo) as geo,ortho_product_directory, resolution, image_breath,\n" +
-            "        producer,satellite,sensor,capture_time,size_of_tif, client_name, deliever_name, \n" +
-            "        deliever_time,geographic_info\n" +
-            " FROM   pdm_ortho_product_info\n" +
+            "        st_asgeojson(image_geo) as geo,\n" +
+            "        satellite,sensor,center_time, \n" +
+            "       geographic_info,producer,\n" +
+            "        receive_station, receive_time, swing_satellite_angle,cloud_percent,width_in_meters,height_in_meters,\n" +
+            "        product_quality,bands,center_longitude,center_latitude \n"+
+            "FROM   pdm_ortho_product_info\n" +
             " WHERE   product_id = #{productId}"
     })
     @Results({@Result(
@@ -37,7 +36,7 @@ public interface PdmOrthoProductInfoMapper {
             property = "productId"
     ), @Result(
             column = "ortho_product_name",
-            property = "orthoProductName"
+            property = "productName"
     ), @Result(
             column = "producer",
             property = "producer"
@@ -51,37 +50,46 @@ public interface PdmOrthoProductInfoMapper {
     ), @Result(
             column = "sensor",
             property = "sensor"
-    ), @Result(
-            column = "resolution",
-            property = "resolution"
-    ), @Result(
-            column = "image_breath",
-            property = "imageBreath"
-    ),  @Result(
-            column = "capture_time",
-            property = "captureTime"
-    ), @Result(
-            column = "size_of_tif",
-            property = "sizeOfTif"
-    ), @Result(
-            column = "client_name",
-            property = "clientName"
-    ), @Result(
-            column = "deliever_name",
-            property = "delieverName"
-    ), @Result(
-            column = "deliever_time",
-            property = "delieverTime"
     ),@Result(
             column = "geographic_info",
             property = "geographicInfo"
     ),@Result(
-            column = "ortho_product_directory",
-            property = "orthoProductDirectory"
+            column = "receive_station",
+            property = "receiveStation"
+    ),@Result(
+            column = "receive_time",
+            property = "receiveTime"
+    ),@Result(
+            column = "swing_satellite_angle",
+            property = "swingSatelliteAngle"
+    ),@Result(
+            column = "cloud_percent",
+            property = "cloudPercent"
+    ),@Result(
+            column = "center_time",
+            property = "centerTime"
+    ),@Result(
+            column = "width_in_meters",
+            property = "widthInMeters"
+    ),@Result(
+            column = "height_in_meters",
+            property = "heightInMeters"
+    ),@Result(
+            column = "product_quality",
+            property = "productQuality"
+    ),@Result(
+            column = "bands",
+            property = "bands"
+    ),@Result(
+            column = "center_longitude",
+            property = "centerLongitude"
+    ),@Result(
+            column = "center_latitude",
+            property = "centerLatitude"
     )
     })
         //查询请求详细信息调用的数据库语句
-    PdmOrthoProductInfo selectOrthoProductDetailByProductId(@Param("productId") String productId);
+    OrthoProductDetail selectOrthoProductDetailByProductId(@Param("productId") String productId);
 
 
 
@@ -200,17 +208,35 @@ public interface PdmOrthoProductInfoMapper {
             +"<if test='null!=image_geo '>"
             +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
             +"</if>"
+            +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
+            + "and ortho_product_name like CONCAT('%',#{product_name},'%') "
+            +"</if>"
             +"and product_id IN ("
-                + "SELECT product_id \n" +
-                "            FROM pdm_product_info \n" +
-                "            WHERE 1=1 \n" +
-                "<if test='null!= client_name &amp; !\"\".equals(client_name)'>"
-                + "and client_name like CONCAT('%',#{client_name},'%')"
-                + "</if>"
-                + "<if test='null!= productDescription &amp; !\"\".equals(productDescription)'>"
-                + "and product_description like CONCAT('%',#{productDescription},'%')"
-                + "</if>"
-                +")"
+            + "SELECT product_id \n" +
+            "            FROM pdm_product_info \n" +
+            "            WHERE 1=1 \n" +
+            "<if test='null!= deliver_name &amp; !\"\".equals(deliver_name)'>"
+            + "and deliver_name = #{deliver_name}"
+            + "</if>"
+            + "<if test='null!= produce_area &amp; !\"\".equals(produce_area)'>"
+            + "and produce_area = #{produce_area}"
+            + "</if>"
+            + "<if test='null!= deliver_method &amp; !\"\".equals(deliver_method)'>"
+            + "and deliver_method = #{deliver_method}"
+            + "</if>"
+            + "<if test='null!= produceStartTime'>"
+            + "and produce_time  &gt;= #{produceStartTime}"
+            + "</if>"
+            + "<if test='null!= produceEndTime'>"
+            + "and produce_time  &lt;= #{produceEndTime}"
+            + "</if>"
+            + "<if test='null!= deliverStartTime'>"
+            + "and deliver_time  &gt;= #{deliverStartTime}"
+            + "</if>"
+            + "<if test='null!= deliverEndTime'>"
+            + "and deliver_time  &lt;= #{deliverEndTime}"
+            + "</if>"
+            +")"
             +"</script>")
     @Results({@Result(
             column = "geo",
@@ -224,7 +250,170 @@ public interface PdmOrthoProductInfoMapper {
             property = "productName"
     )})
     List<AdvanceProductSimpleInfo> selectSimpleinfoByconditions(@Param("producer")String producer,
-                                                                    @Param("image_geo")Object image_geo,
-                                                                    @Param("client_name")String clientName,
-                                                                    @Param("productDescription")String description);
+                                                                @Param("image_geo")Object image_geo,
+                                                                @Param("deliver_name")String deliverName,
+                                                                @Param("produce_area")String produceArea,
+                                                                @Param("deliver_method")String deliverMethod,
+                                                                @Param("produceStartTime") Date produceStartTime,
+                                                                @Param("produceEndTime") Date produceEndTime,
+                                                                @Param("deliverStartTime") Date deliverStartTime,
+                                                                @Param("deliverEndTime") Date deliverEndTime,
+                                                                @Param("product_name")String productName);
+
+
+
+
+
+    @Select("<script>"
+            +"<if test='isOrtho '>"
+            +"SELECT product_id,st_asgeojson(image_geo) as geo, ortho_product_name\n" +
+            "            FROM pdm_ortho_product_info  \n"+
+            "            WHERE 1=1 \n"+
+            "<if test='null!= producer &amp; !\"\".equals(producer)'>"
+            + "and producer like CONCAT('%',#{producer},'%') "
+            +"</if>"
+            +"<if test='null!=image_geo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"</if>"
+            +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
+            + "and ortho_product_name like CONCAT('%',#{product_name},'%') "
+            +"</if>"
+            +"and product_id IN ("
+            + "SELECT product_id \n" +
+            "            FROM pdm_product_info \n" +
+            "            WHERE 1=1 \n" +
+            "<if test='null!= deliver_name &amp; !\"\".equals(deliver_name)'>"
+            + "and deliver_name = #{deliver_name}"
+            + "</if>"
+            + "<if test='null!= produce_area &amp; !\"\".equals(produce_area)'>"
+            + "and produce_area = #{produce_area}"
+            + "</if>"
+            + "<if test='null!= deliver_method &amp; !\"\".equals(deliver_method)'>"
+            + "and deliver_method = #{deliver_method}"
+            + "</if>"
+            + "<if test='null!= produceStartTime'>"
+            + "and produce_time  &gt;= #{produceStartTime}"
+            + "</if>"
+            + "<if test='null!= produceEndTime'>"
+            + "and produce_time  &lt;= #{produceEndTime}"
+            + "</if>"
+            + "<if test='null!= deliverStartTime'>"
+            + "and deliver_time  &gt;= #{deliverStartTime}"
+            + "</if>"
+            + "<if test='null!= deliverEndTime'>"
+            + "and deliver_time  &lt;= #{deliverEndTime}"
+            + "</if>"
+            +")"
+            +"</if>"
+            +"<if test='isInlay '>"
+            +"<if test='isOrtho '>"
+            +"UNION"
+            +"</if>"
+            +" SELECT product_id,st_asgeojson(image_geo) as geo, inlay_product_name as ortho_product_name\n" +
+            "            FROM pdm_inlay_product_info  \n"+
+            "            WHERE 1=1 \n"+
+            "<if test='null!= producer &amp; !\"\".equals(producer)'>"
+            + "and producer like CONCAT('%',#{producer},'%') "
+            +"</if>"
+            +"<if test='null!=image_geo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"</if>"
+            +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
+            + "and inlay_product_name like CONCAT('%',#{product_name},'%') "
+            +"</if>"
+            +"and product_id IN ("
+            + "SELECT product_id \n" +
+            "            FROM pdm_product_info \n" +
+            "            WHERE 1=1 \n" +
+            "<if test='null!= deliver_name &amp; !\"\".equals(deliver_name)'>"
+            + "and deliver_name = #{deliver_name}"
+            + "</if>"
+            + "<if test='null!= produce_area &amp; !\"\".equals(produce_area)'>"
+            + "and produce_area = #{produce_area}"
+            + "</if>"
+            + "<if test='null!= deliver_method &amp; !\"\".equals(deliver_method)'>"
+            + "and deliver_method = #{deliver_method}"
+            + "</if>"
+            + "<if test='null!= produceStartTime'>"
+            + "and produce_time &gt;= #{produceStartTime}"
+            + "</if>"
+            + "<if test='null!= produceEndTime'>"
+            + "and produce_time  &lt;= #{produceEndTime}"
+            + "</if>"
+            + "<if test='null!= deliverStartTime'>"
+            + "and deliver_time  &gt;= #{deliverStartTime}"
+            + "</if>"
+            + "<if test='null!= deliverEndTime'>"
+            + "and deliver_time  &lt;= #{deliverEndTime}"
+            + "</if>"
+            +")"
+            +"</if>"
+            +"<if test='isSubdivision '>"
+            +"<if test='isOrtho or isInlay'>"
+            +"UNION"
+            +"</if>"
+            +" SELECT product_id,st_asgeojson(image_geo) as geo, subdivision_product_name as ortho_product_name\n" +
+            "            FROM pdm_subdivision_product_info  \n"+
+            "            WHERE 1=1 \n"+
+            "<if test='null!= producer &amp; !\"\".equals(producer)'>"
+            + "and producer like CONCAT('%',#{producer},'%') "
+            +"</if>"
+            +"<if test='null!=image_geo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"</if>"
+            +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
+            + "and subdivision_product_name like CONCAT('%',#{product_name},'%') "
+            +"</if>"
+            +"and product_id IN ("
+            + "SELECT product_id \n" +
+            "            FROM pdm_product_info \n" +
+            "            WHERE 1=1 \n" +
+            "<if test='null!= deliver_name &amp; !\"\".equals(deliver_name)'>"
+            + "and deliver_name = #{deliver_name}"
+            + "</if>"
+            + "<if test='null!= produce_area &amp; !\"\".equals(produce_area)'>"
+            + "and produce_area = #{produce_area}"
+            + "</if>"
+            + "<if test='null!= deliver_method &amp; !\"\".equals(deliver_method)'>"
+            + "and deliver_method = #{deliver_method}"
+            + "</if>"
+            + "<if test='null!= produceStartTime'>"
+            + "and produce_time  &gt;= #{produceStartTime}"
+            + "</if>"
+            + "<if test='null!= produceEndTime'>"
+            + "and produce_time  &lt;= #{produceEndTime}"
+            + "</if>"
+            + "<if test='null!= deliverStartTime'>"
+            + "and deliver_time  &gt;= #{deliverStartTime}"
+            + "</if>"
+            + "<if test='null!= deliverEndTime'>"
+            + "and deliver_time  &lt;= #{deliverEndTime}"
+            + "</if>"
+            +")"
+            +"</if>"
+            +"</script>")
+    @Results({@Result(
+            column = "geo",
+            property = "imageGeo"
+
+    ), @Result(
+            column = "product_id",
+            property = "productId"
+    ), @Result(
+            column = "ortho_product_name",
+            property = "productName"
+    )})
+    List<AdvanceProductSimpleInfo> selectSimpleinfoByAllconditions(@Param("producer")String producer,
+                                                                   @Param("image_geo")Object image_geo,
+                                                                   @Param("deliver_name")String deliverName,
+                                                                   @Param("produce_area")String produceArea,
+                                                                   @Param("deliver_method")String deliverMethod,
+                                                                   @Param("produceStartTime") Date produceStartTime,
+                                                                   @Param("produceEndTime") Date produceEndTime,
+                                                                   @Param("deliverStartTime") Date deliverStartTime,
+                                                                   @Param("deliverEndTime") Date deliverEndTime,
+                                                                   @Param("product_name")String productName,
+                                                                   @Param("isOrtho") boolean isOrtho,
+                                                                   @Param("isInlay") boolean isInlay,
+                                                                   @Param("isSubdivision") boolean isSubdivision);
 }

@@ -12,30 +12,48 @@
     <result column="sensor" property="sensor" jdbcType="VARCHAR" />
     <result column="resolution" property="resolution" jdbcType="NUMERIC" />
     <result column="image_breath" property="imageBreath" jdbcType="VARCHAR" />
-    <result column="capture_time" property="captureTime" jdbcType="TIMESTAMP" />
+    <result column="center_time" property="centerTime" jdbcType="TIMESTAMP" />
     <result column="size_of_tif" property="sizeOfTif" jdbcType="VARCHAR" />
     <result column="client_name" property="clientName" jdbcType="VARCHAR" />
     <result column="deliever_name" property="delieverName" jdbcType="VARCHAR" />
     <result column="deliever_time" property="delieverTime" jdbcType="VARCHAR" />
+    <result column="receive_station" property="receiveStation" jdbcType="VARCHAR" />
+    <result column="receive_time" property="receiveTime" jdbcType="TIMESTAMP" />
+    <result column="swing_satellite_angle" property="swingSatelliteAngle" jdbcType="VARCHAR" />
+    <result column="cloud_percent" property="cloudPercent" jdbcType="REAL" />
+    <result column="width_in_meters" property="widthInMeters" jdbcType="DOUBLE" />
+    <result column="height_in_meters" property="heightInMeters" jdbcType="DOUBLE" />
+    <result column="product_quality" property="productQuality" jdbcType="VARCHAR" />
+    <result column="bands" property="bands" jdbcType="VARCHAR" />
+    <result column="center_longitude" property="centerLongitude" jdbcType="DOUBLE" />
+    <result column="center_latitude" property="centerLatitude" jdbcType="DOUBLE" />
   </resultMap>
   <insert id="insert" parameterType="com.cgwx.data.entity.PdmOrthoProductInfo" >
     insert into pdm_ortho_product_info (product_id, ortho_product_name, image_geo, 
       ortho_product_directory, producer, geographic_info, 
       satellite, sensor, resolution, 
-      image_breath, capture_time, size_of_tif, 
-      client_name, deliever_name, deliever_time
-      )
+      image_breath, center_time, size_of_tif, 
+      client_name, deliever_name, deliever_time, 
+      receive_station, receive_time, swing_satellite_angle, 
+      cloud_percent, width_in_meters, height_in_meters, 
+      product_quality, bands, center_longitude, 
+      center_latitude)
     values (#{productId,jdbcType=VARCHAR}, #{orthoProductName,jdbcType=VARCHAR}, #{imageGeo,jdbcType=OTHER}, 
       #{orthoProductDirectory,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, #{geographicInfo,jdbcType=VARCHAR}, 
       #{satellite,jdbcType=VARCHAR}, #{sensor,jdbcType=VARCHAR}, #{resolution,jdbcType=NUMERIC}, 
-      #{imageBreath,jdbcType=VARCHAR}, #{captureTime,jdbcType=TIMESTAMP}, #{sizeOfTif,jdbcType=VARCHAR}, 
-      #{clientName,jdbcType=VARCHAR}, #{delieverName,jdbcType=VARCHAR}, #{delieverTime,jdbcType=VARCHAR}
-      )
+      #{imageBreath,jdbcType=VARCHAR}, #{centerTime,jdbcType=TIMESTAMP}, #{sizeOfTif,jdbcType=VARCHAR}, 
+      #{clientName,jdbcType=VARCHAR}, #{delieverName,jdbcType=VARCHAR}, #{delieverTime,jdbcType=VARCHAR}, 
+      #{receiveStation,jdbcType=VARCHAR}, #{receiveTime,jdbcType=TIMESTAMP}, #{swingSatelliteAngle,jdbcType=VARCHAR}, 
+      #{cloudPercent,jdbcType=REAL}, #{widthInMeters,jdbcType=DOUBLE}, #{heightInMeters,jdbcType=DOUBLE}, 
+      #{productQuality,jdbcType=VARCHAR}, #{bands,jdbcType=VARCHAR}, #{centerLongitude,jdbcType=DOUBLE}, 
+      #{centerLatitude,jdbcType=DOUBLE})
   </insert>
   <select id="selectAll" resultMap="BaseResultMap" >
     select product_id, ortho_product_name, image_geo, ortho_product_directory, producer, 
-    geographic_info, satellite, sensor, resolution, image_breath, capture_time, size_of_tif, 
-    client_name, deliever_name, deliever_time
+    geographic_info, satellite, sensor, resolution, image_breath, center_time, size_of_tif, 
+    client_name, deliever_name, deliever_time, receive_station, receive_time, swing_satellite_angle, 
+    cloud_percent, width_in_meters, height_in_meters, product_quality, bands, center_longitude, 
+    center_latitude
     from pdm_ortho_product_info
   </select>
 </mapper>

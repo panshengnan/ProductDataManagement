@@ -18,50 +18,17 @@ public class SinglePeriodThemeticProductDetail {
 
     private String sizeOfTif;
 
-
-
-
-
     private String centerImagingTime;
 
     private String produceTime;
 
-
-
-    //private String analysisReportUrl;
-    //private String allFileDownloadUrl;
-
     private String thumbnailUrl;
-
-
 
     private List<FileUrl> fileListAndUrl;
 
     private String singlePeriodProductName;
 
-
-//    private String resolution;
-//
-//    private String imageBreath;
-//
-//    private String cloudPercent;
-//
-//    private String centerImagingTime;
-//    private String singlePeriodProductDirectory;
-//    private String nation;
-//
-//    private String province;
-//
-//    private String city;
-//
-//    private String county;
-//
-//    private String village;
-//
-//    private String geographicInfo;
-
-
-
+    private String layerName;
     public String getSinglePeriodProductId() {
         return singlePeriodProductId;
     }
@@ -70,6 +37,17 @@ public class SinglePeriodThemeticProductDetail {
         this.singlePeriodProductId = singlePeriodProductId == null ? null : singlePeriodProductId.trim();
     }
 
+    public String getCenterImagingTime() {
+        return centerImagingTime;
+    }
+
+    public String getLayerName() {
+        return layerName;
+    }
+
+    public void setLayerName(String layerName) {
+        this.layerName = layerName;
+    }
 
     public String getImageGeo() {
         return imageGeo;
@@ -112,11 +90,6 @@ public class SinglePeriodThemeticProductDetail {
         this.sizeOfTif = sizeOfTif == null ? null : sizeOfTif.trim();
     }
 
-
-//    public  String getAnalysisReportUrl(){return  analysisReportUrl;}
-//    public void setAnalysisReportUrl(String analysisReportUrl){
-//        this.analysisReportUrl =analysisReportUrl == null ? null : analysisReportUrl.trim();
-//    }
     public  String getThumbnailUrl(){return  thumbnailUrl;}
     public void setThumbnailUrl(String thumbnailUrl){
         this.thumbnailUrl =thumbnailUrl == null ? null : thumbnailUrl.trim();
@@ -126,15 +99,6 @@ public class SinglePeriodThemeticProductDetail {
     public void setFileListAndUrl(List<FileUrl> fileListAndUrl){
         this.fileListAndUrl =fileListAndUrl;
     }
-
-//    public String getAllFileDownloadUrl() {
-//        return allFileDownloadUrl;
-//    }
-//    public void setAllFileDownloadUrl(String allFileDownloadUrl){
-//        this.allFileDownloadUrl=allFileDownloadUrl;
-//    }
-
-
 
     public String getCenterimagingTime() {
         return centerImagingTime;
@@ -159,90 +123,4 @@ public class SinglePeriodThemeticProductDetail {
         this.singlePeriodProductName =singlePeriodProductName == null ? null : singlePeriodProductName.trim();
 
     }
-
-//    public String getNation() {
-//        return nation;
-//    }
-//
-//    public void setNation(String nation) {
-//        this.nation = nation == null ? null : nation.trim();
-//    }
-//
-//    public String getProvince() {
-//        return province;
-//    }
-//
-//    public void setProvince(String province) {
-//        this.province = province == null ? null : province.trim();
-//    }
-//
-//    public String getCity() {
-//        return city;
-//    }
-//
-//    public void setCity(String city) {
-//        this.city = city == null ? null : city.trim();
-//    }
-//
-//    public String getCounty() {
-//        return county;
-//    }
-//
-//    public void setCounty(String county) {
-//        this.county = county == null ? null : county.trim();
-//    }
-//
-//    public String getVillage() {
-//        return village;
-//    }
-//
-//    public void setVillage(String village) {
-//        this.village = village == null ? null : village.trim();
-//    }
-//
-//    public String getGeographicInfo() {
-//        return geographicInfo;
-//    }
-//
-//    public void setGeographicInfo(String geographicInfo) {
-//        this.geographicInfo = geographicInfo == null ? null : geographicInfo.trim();
-//    }
-
-
-    //    public String getResolution() {
-//        return resolution;
-//    }
-//
-//    public void setResolution(String resolution) {
-//        this.resolution = resolution;
-//    }
-//
-//    public String getImageBreath() {
-//        return imageBreath;
-//    }
-//
-//    public void setImageBreath(String imageBreath) {
-//        this.imageBreath = imageBreath == null ? null : imageBreath.trim();
-//    }
-//
-//    public String getCloudPercent() {
-//        return cloudPercent;
-//    }
-//
-//    public void setCloudPercent(String cloudPercent) {
-//        this.cloudPercent = cloudPercent;
-//    }
-//
-//    public String getCenterImagingTime() {
-//        return centerImagingTime;
-//    }
-//
-//    public void setCenterImagingTime(String centerImagingTime) {
-//        this.centerImagingTime = centerImagingTime;
-//    }
-
-
-
-
-
 }

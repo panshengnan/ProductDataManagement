@@ -42,4 +42,11 @@ public interface PdmThemeticProductDetailIndustryInfoMapper {
     })
 
     List<Industry> selectIndustryByProductid(@Param("productId")String productId);
+
+
+    @Select({"SELECT product_id\n" +
+            "            FROM pdm_themetic_product_detail_industry_info\n"+
+            "            WHERE ${where}"})
+
+    List<String> selectThemeticidByIndustrylist(@Param("where")String where);
 }

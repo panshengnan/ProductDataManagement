@@ -19,6 +19,16 @@ public class PdmProductInfo {
 
     private String producer;
 
+    private String archivePersonnel;
+
+    private String produceArea;
+
+    private Date produceTime;
+
+    private String deliverMethod;
+
+    private String dataProcessStep;
+
     public String getProductId() {
         return productId;
     }
@@ -81,5 +91,45 @@ public class PdmProductInfo {
 
     public void setProducer(String producer) {
         this.producer = producer == null ? null : producer.trim();
+    }
+
+    public String getArchivePersonnel() {
+        return archivePersonnel;
+    }
+
+    public void setArchivePersonnel(String archivePersonnel) {
+        this.archivePersonnel = archivePersonnel == null ? null : archivePersonnel.trim();
+    }
+
+    public String getProduceArea() {
+        return produceArea;
+    }
+
+    public void setProduceArea(String produceArea) {
+        this.produceArea = produceArea == null ? null : produceArea.trim();
+    }
+
+    public Date getProduceTime() {
+        return produceTime;
+    }
+
+    public void setProduceTime(Date produceTime) {
+        this.produceTime = produceTime;
+    }
+
+    public String getDeliverMethod() {
+        return deliverMethod;
+    }
+
+    public void setDeliverMethod(String deliverMethod) {
+        this.deliverMethod = deliverMethod == null ? null : deliverMethod.trim();
+    }
+
+    public String getDataProcessStep() {
+        return dataProcessStep;
+    }
+
+    public void setDataProcessStep(String dataProcessStep) {
+        this.dataProcessStep = dataProcessStep == null ? null : dataProcessStep.trim();
     }
 }

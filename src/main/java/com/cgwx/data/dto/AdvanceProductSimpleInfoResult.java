@@ -2,10 +2,10 @@ package com.cgwx.data.dto;
 
 import java.util.List;
 
-public class ThemeticProductListByGeosResult {
+public class AdvanceProductSimpleInfoResult {
     private long totalItems;
     private int totalPageNum;
-    private List<ThemeticProductListByGeos> productQueryList;
+    private List<AdvanceProductSimpleInfo> productQueryList;
 
     public long getTotalItems() {
         return totalItems;
@@ -23,11 +23,11 @@ public class ThemeticProductListByGeosResult {
         this.totalPageNum = totalPageNum;
     }
 
-    public List<ThemeticProductListByGeos> getProductQueryList() {
+    public List<AdvanceProductSimpleInfo> getProductQueryList() {
         return productQueryList;
     }
 
-    public void setProductQueryList(List<ThemeticProductListByGeos> productQueryList) {
+    public void setProductQueryList(List<AdvanceProductSimpleInfo> productQueryList) {
         this.productQueryList = productQueryList;
     }
 }
