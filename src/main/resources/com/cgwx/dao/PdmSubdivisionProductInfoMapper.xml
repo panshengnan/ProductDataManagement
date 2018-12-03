@@ -22,7 +22,7 @@
       deliever_name, deliever_time, resolution, 
       geographic_info)
     values (#{productId,jdbcType=VARCHAR}, #{subdivisionProductName,jdbcType=VARCHAR}, 
-      #{imageGeo,jdbcType=OTHER}, #{subdivisionProductDirectory,jdbcType=VARCHAR}, #{numberOfTif,jdbcType=INTEGER}, 
+      st_geomfromgeojson(#{imageGeo,jdbcType=OTHER}), #{subdivisionProductDirectory,jdbcType=VARCHAR}, #{numberOfTif,jdbcType=INTEGER},
       #{industry,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, 
       #{delieverName,jdbcType=VARCHAR}, #{delieverTime,jdbcType=VARCHAR}, #{resolution,jdbcType=NUMERIC}, 
       #{geographicInfo,jdbcType=VARCHAR})

@@ -209,4 +209,11 @@ public interface PdmThemeticProductDetailInfoMapper {
             property = "singlePeriodId")
     })
     List<ThemeticProductSimpleInfo> selectSimpleinfotest();
+
+
+    @Select({"update pdm_themetic_product_detail_info\n" +
+            "  set image_geo = st_geomfromgeojson(#{geoJson})\n"
+            +" where product_id = #{productId} and single_period_product_id = #{singleId} "
+    })
+    void updateThemeticProductDetailImgGeo(@Param("productId") String productId,@Param("singleId") String singleId,@Param("geoJson") String geoJson);
 }

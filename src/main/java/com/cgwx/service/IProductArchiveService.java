@@ -4,11 +4,16 @@ import com.cgwx.data.dto.ArchivalRecordsItems;
 import com.cgwx.data.dto.SecondaryFileStructure;
 import com.cgwx.data.dto.UploadFileReturn;
 import com.cgwx.data.entity.*;
+import com.github.pagehelper.PageInfo;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.List;
 
 /**
@@ -35,8 +40,8 @@ public interface IProductArchiveService {              //
     List<String> getClientNameList(String clientName);
     List<String> getDeliverNameList(String deliverName);
     List<String> getProducerList(String producer);
-    int updateProductInfoForTheme(PdmProductInfo pdmProductInfo);
-    String getThemeticProductName(String tempId);
+    int updateProductInfo(PdmProductInfo pdmProductInfo);
+    String getProductName(String tempId);
     String getThemeticProductTemporaryPath(String tempId);
     int updateThemeticProductDetailIndustry(PdmThemeticProductDetailIndustryInfo pdmThemeticProductDetailIndustryInfo);
     int updateThemeticProductDetail(PdmThemeticProductDetailInfo pdmThemeticProductDetailInfo);
@@ -44,8 +49,14 @@ public interface IProductArchiveService {              //
     int insertPdmProducerInfo(String producerName);
     int selectCountByProducerName(String producerName);
     int updatePdmProducerInfo(String producerName);
-    List<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel);
-    int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo,String tempId);
+    PageInfo<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel, int curPageNum, int maxResult, String productName, int archiveType, int archiveStatus);
+    int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo,String tempId,int productType);
     String getArchivePersonnelName(String archivePersonnel);
+    String writeArchiveRecordAndWriteArchiveCheckInfo(String path,String archivePersonnel,int type);
+    int updateOrthoProduct(PdmOrthoProductInfo pdmOrthoProductInfo);
+    int updateInlayProduct(PdmInlayProductInfo pdmInlayProductInfo);
+    int updateSubdivisionProduct(PdmSubdivisionProductInfo pdmSubdivisionProductInfo);
+    int updateAdvancedProductShpInfo(PdmAdvancedProductShpInfo pdmAdvancedProductShpInfo);
+    String xml2jsonString(String path)throws JSONException, IOException;
 
 }

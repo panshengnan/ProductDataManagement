@@ -18,7 +18,7 @@
       inlay_product_directory, producer, geographic_info, 
       size_of_tif, client_name, deliever_name, 
       deliever_time)
-    values (#{productId,jdbcType=VARCHAR}, #{inlayProductName,jdbcType=VARCHAR}, #{imageGeo,jdbcType=OTHER}, 
+    values (#{productId,jdbcType=VARCHAR}, #{inlayProductName,jdbcType=VARCHAR}, st_geomfromgeojson(#{imageGeo,jdbcType=OTHER}),
       #{inlayProductDirectory,jdbcType=VARCHAR}, #{producer,jdbcType=VARCHAR}, #{geographicInfo,jdbcType=VARCHAR}, 
       #{sizeOfTif,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, #{delieverName,jdbcType=VARCHAR}, 
       #{delieverTime,jdbcType=VARCHAR})

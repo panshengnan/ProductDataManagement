@@ -46,4 +46,10 @@ public interface PdmUserInfoMapper {
             "WHERE user_id = #{userId}"
     )
     String selectUserNameByUserId(@Param("userId") String userId);
+
+    @Select("SELECT user_name\n" +
+            "FROM pdm_user_info\n" +
+            "WHERE 1=1 order by user_name collate \"C\" "
+    )
+    List<String> selectAllUsers();
 }

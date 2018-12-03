@@ -125,41 +125,54 @@ public class IProductDownloadServiceImpl implements IProductDownloadService {
         return productLinkList;
     }
 
-    @Override/*只写了专题heihei*/
+    @Override/*高级产品heihei*/
     public int generateProductLink(int productType,String productId,String productName){
 
+        String productPathVar = "";
         switch (productType) {
 
             case 1://专题
-                String path = getEntityFilePath(productId);
-                SecondaryFileStructure secondaryFileStructure = iProductArchiveService.getSecondaryFileStructure(path);
-                List<DirectoryInfo> directoryInfoList =secondaryFileStructure.getDirectory();
-                List<String> files = secondaryFileStructure.getFile();
-                for(String file : files)
-                {
-                    PdmProductStoreLinkInfo pdmProductStoreLinkInfo = new PdmProductStoreLinkInfo();
-                    pdmProductStoreLinkInfo.setProductId(productId);
-                    pdmProductStoreLinkInfo.setSinglePeriodProductId("");
-                    pdmProductStoreLinkInfo.setFileName(file);
-                    pdmProductStoreLinkInfo.setStoreLink("专题产品/"+productName+'/'+file);
-                    pdmProductStoreLinkInfoMapper.insert(pdmProductStoreLinkInfo);
-                }
-                for(DirectoryInfo directoryInfo : directoryInfoList)
-                {
-                    List<String> fileList = directoryInfo.getFileListInDirectory();
-                    for(String fileName : fileList) {
-                        PdmProductStoreLinkInfo pdmProductStoreLinkInfo = new PdmProductStoreLinkInfo();
-                        pdmProductStoreLinkInfo.setProductId(productId);
-                        pdmProductStoreLinkInfo.setSinglePeriodProductId(directoryInfo.getSingleTempId());
-                        pdmProductStoreLinkInfo.setFileName(fileName);
-                        pdmProductStoreLinkInfo.setStoreLink("专题产品/"+productName+'/'+directoryInfo.getDirectoryName()+'/'+fileName);
-                        pdmProductStoreLinkInfoMapper.insert(pdmProductStoreLinkInfo);
-                    }
-                }
+                productPathVar = "专题产品/";
+                break;
+            case 2://正射
+                productPathVar = "正射产品/";
+                break;
+            case 3://镶嵌
+                productPathVar = "镶嵌产品/";
+                break;
+            case 4://分幅
+                productPathVar = "分幅产品/";
                 break;
             default:
                 break;
         }
+
+        String path = getEntityFilePath(productId);
+        SecondaryFileStructure secondaryFileStructure = iProductArchiveService.getSecondaryFileStructure(path);
+        List<DirectoryInfo> directoryInfoList =secondaryFileStructure.getDirectory();
+        List<String> files = secondaryFileStructure.getFile();
+        for(String file : files)
+        {
+            PdmProductStoreLinkInfo pdmProductStoreLinkInfo = new PdmProductStoreLinkInfo();
+            pdmProductStoreLinkInfo.setProductId(productId);
+            pdmProductStoreLinkInfo.setSinglePeriodProductId("");
+            pdmProductStoreLinkInfo.setFileName(file);
+            pdmProductStoreLinkInfo.setStoreLink(productPathVar+productName+'/'+file);
+            pdmProductStoreLinkInfoMapper.insert(pdmProductStoreLinkInfo);
+        }
+        for(DirectoryInfo directoryInfo : directoryInfoList)
+        {
+            List<String> fileList = directoryInfo.getFileListInDirectory();
+            for(String fileName : fileList) {
+                PdmProductStoreLinkInfo pdmProductStoreLinkInfo = new PdmProductStoreLinkInfo();
+                pdmProductStoreLinkInfo.setProductId(productId);
+                pdmProductStoreLinkInfo.setSinglePeriodProductId(directoryInfo.getSingleTempId());
+                pdmProductStoreLinkInfo.setFileName(fileName);
+                pdmProductStoreLinkInfo.setStoreLink(productPathVar+productName+'/'+directoryInfo.getDirectoryName()+'/'+fileName);
+                pdmProductStoreLinkInfoMapper.insert(pdmProductStoreLinkInfo);
+            }
+        }
+
         return 1;
     }
 

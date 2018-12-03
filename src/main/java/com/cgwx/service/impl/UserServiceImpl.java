@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements IUserService {
 
@@ -53,6 +55,12 @@ public class UserServiceImpl implements IUserService {
             pdmUserInfoMapper.insertPasswd(account, DigestUtils.md5DigestAsHex(passwd.getBytes()));
             return "true";
         }
+    }
+
+    @Override
+    public List<String> getUserList()
+    {
+        return pdmUserInfoMapper.selectAllUsers();
     }
 
 }

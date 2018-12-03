@@ -22,7 +22,7 @@ public interface PdmProducerInfoMapper {
 
     @Select("SELECT producer\n" +
             "FROM pdm_producer_info\n" +
-            "WHERE producer like  '%${producer}%' order by producer collate \"C\" "
+            "WHERE producer like  '%${producer}%' and producer <> '' order by producer collate \"C\" "
     )
     List<String> selectProducerList(@Param("producer") String producer);
 

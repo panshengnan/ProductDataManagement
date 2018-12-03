@@ -182,13 +182,13 @@ public class MetadataServiceImpl implements IMetadataService {
 
        orthoProductDetail.setImageBreath(pdmOrthoProductInfo.getImageBreath());
        SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-       if(pdmOrthoProductInfo.getCaptureTime()==null)
+       if(pdmOrthoProductInfo.getCenterTime()==null)
        {
            orthoProductDetail.setCaptureTime(null);
        }
        else
        {
-           orthoProductDetail.setCaptureTime(timeFormat.format(pdmOrthoProductInfo.getCaptureTime()));
+           orthoProductDetail.setCaptureTime(timeFormat.format(pdmOrthoProductInfo.getCenterTime()));
        }
 
        orthoProductDetail.setSizeOfTif(pdmOrthoProductInfo.getSizeOfTif());

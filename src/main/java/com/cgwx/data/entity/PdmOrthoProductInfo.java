@@ -24,7 +24,7 @@ public class PdmOrthoProductInfo {
 
     private String imageBreath;
 
-    private Date captureTime;
+    private Date centerTime;
 
     private String sizeOfTif;
 
@@ -33,6 +33,26 @@ public class PdmOrthoProductInfo {
     private String delieverName;
 
     private String delieverTime;
+
+    private String receiveStation;
+
+    private Date receiveTime;
+
+    private String swingSatelliteAngle;
+
+    private Float cloudPercent;
+
+    private Double widthInMeters;
+
+    private Double heightInMeters;
+
+    private String productQuality;
+
+    private String bands;
+
+    private Double centerLongitude;
+
+    private Double centerLatitude;
 
     public String getProductId() {
         return productId;
@@ -114,12 +134,12 @@ public class PdmOrthoProductInfo {
         this.imageBreath = imageBreath == null ? null : imageBreath.trim();
     }
 
-    public Date getCaptureTime() {
-        return captureTime;
+    public Date getCenterTime() {
+        return centerTime;
     }
 
-    public void setCaptureTime(Date captureTime) {
-        this.captureTime = captureTime;
+    public void setCenterTime(Date centerTime) {
+        this.centerTime = centerTime;
     }
 
     public String getSizeOfTif() {
@@ -152,5 +172,85 @@ public class PdmOrthoProductInfo {
 
     public void setDelieverTime(String delieverTime) {
         this.delieverTime = delieverTime == null ? null : delieverTime.trim();
+    }
+
+    public String getReceiveStation() {
+        return receiveStation;
+    }
+
+    public void setReceiveStation(String receiveStation) {
+        this.receiveStation = receiveStation == null ? null : receiveStation.trim();
+    }
+
+    public Date getReceiveTime() {
+        return receiveTime;
+    }
+
+    public void setReceiveTime(Date receiveTime) {
+        this.receiveTime = receiveTime;
+    }
+
+    public String getSwingSatelliteAngle() {
+        return swingSatelliteAngle;
+    }
+
+    public void setSwingSatelliteAngle(String swingSatelliteAngle) {
+        this.swingSatelliteAngle = swingSatelliteAngle == null ? null : swingSatelliteAngle.trim();
+    }
+
+    public Float getCloudPercent() {
+        return cloudPercent;
+    }
+
+    public void setCloudPercent(Float cloudPercent) {
+        this.cloudPercent = cloudPercent;
+    }
+
+    public Double getWidthInMeters() {
+        return widthInMeters;
+    }
+
+    public void setWidthInMeters(Double widthInMeters) {
+        this.widthInMeters = widthInMeters;
+    }
+
+    public Double getHeightInMeters() {
+        return heightInMeters;
+    }
+
+    public void setHeightInMeters(Double heightInMeters) {
+        this.heightInMeters = heightInMeters;
+    }
+
+    public String getProductQuality() {
+        return productQuality;
+    }
+
+    public void setProductQuality(String productQuality) {
+        this.productQuality = productQuality == null ? null : productQuality.trim();
+    }
+
+    public String getBands() {
+        return bands;
+    }
+
+    public void setBands(String bands) {
+        this.bands = bands == null ? null : bands.trim();
+    }
+
+    public Double getCenterLongitude() {
+        return centerLongitude;
+    }
+
+    public void setCenterLongitude(Double centerLongitude) {
+        this.centerLongitude = centerLongitude;
+    }
+
+    public Double getCenterLatitude() {
+        return centerLatitude;
+    }
+
+    public void setCenterLatitude(Double centerLatitude) {
+        this.centerLatitude = centerLatitude;
     }
 }

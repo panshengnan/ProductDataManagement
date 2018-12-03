@@ -11,18 +11,27 @@
     <result column="deliver_time" property="deliverTime" jdbcType="TIMESTAMP" />
     <result column="producer" property="producer" jdbcType="VARCHAR" />
     <result column="archive_personnel" property="archivePersonnel" jdbcType="VARCHAR" />
+    <result column="produce_area" property="produceArea" jdbcType="VARCHAR" />
+    <result column="produce_time" property="produceTime" jdbcType="TIMESTAMP" />
+    <result column="deliver_method" property="deliverMethod" jdbcType="VARCHAR" />
+    <result column="data_process_step" property="dataProcessStep" jdbcType="VARCHAR" />
   </resultMap>
   <insert id="insert" parameterType="com.cgwx.data.entity.PdmProductInfo" >
     insert into pdm_product_info (product_id, product_name, product_type, 
       product_description, client_name, deliver_name, 
-      deliver_time, producer,archive_personnel)
+      deliver_time, producer, archive_personnel, 
+      produce_area, produce_time, deliver_method, 
+      data_process_step)
     values (#{productId,jdbcType=VARCHAR}, #{productName,jdbcType=VARCHAR}, #{productType,jdbcType=INTEGER}, 
       #{productDescription,jdbcType=VARCHAR}, #{clientName,jdbcType=VARCHAR}, #{deliverName,jdbcType=VARCHAR}, 
-      #{deliverTime,jdbcType=TIMESTAMP}, #{producer,jdbcType=VARCHAR}, #{archivePersonnel,jdbcType=VARCHAR})
+      #{deliverTime,jdbcType=TIMESTAMP}, #{producer,jdbcType=VARCHAR}, #{archivePersonnel,jdbcType=VARCHAR}, 
+      #{produceArea,jdbcType=VARCHAR}, #{produceTime,jdbcType=TIMESTAMP}, #{deliverMethod,jdbcType=VARCHAR}, 
+      #{dataProcessStep,jdbcType=VARCHAR})
   </insert>
   <select id="selectAll" resultMap="BaseResultMap" >
     select product_id, product_name, product_type, product_description, client_name, 
-    deliver_name, deliver_time, producer,archive_personnel
+    deliver_name, deliver_time, producer, archive_personnel, produce_area, produce_time, 
+    deliver_method, data_process_step
     from pdm_product_info
   </select>
 </mapper>

@@ -201,16 +201,16 @@ public interface PdmOrthoProductInfoMapper {
             +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
             +"</if>"
             +"and product_id IN ("
-                + "SELECT product_id \n" +
-                "            FROM pdm_product_info \n" +
-                "            WHERE 1=1 \n" +
-                "<if test='null!= client_name &amp; !\"\".equals(client_name)'>"
-                + "and client_name like CONCAT('%',#{client_name},'%')"
-                + "</if>"
-                + "<if test='null!= productDescription &amp; !\"\".equals(productDescription)'>"
-                + "and product_description like CONCAT('%',#{productDescription},'%')"
-                + "</if>"
-                +")"
+            + "SELECT product_id \n" +
+            "            FROM pdm_product_info \n" +
+            "            WHERE 1=1 \n" +
+            "<if test='null!= client_name &amp; !\"\".equals(client_name)'>"
+            + "and client_name like CONCAT('%',#{client_name},'%')"
+            + "</if>"
+            + "<if test='null!= productDescription &amp; !\"\".equals(productDescription)'>"
+            + "and product_description like CONCAT('%',#{productDescription},'%')"
+            + "</if>"
+            +")"
             +"</script>")
     @Results({@Result(
             column = "geo",
@@ -224,7 +224,7 @@ public interface PdmOrthoProductInfoMapper {
             property = "productName"
     )})
     List<AdvanceProductSimpleInfo> selectSimpleinfoByconditions(@Param("producer")String producer,
-                                                                    @Param("image_geo")Object image_geo,
-                                                                    @Param("client_name")String clientName,
-                                                                    @Param("productDescription")String description);
+                                                                @Param("image_geo")Object image_geo,
+                                                                @Param("client_name")String clientName,
+                                                                @Param("productDescription")String description);
 }

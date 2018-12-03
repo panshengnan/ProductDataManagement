@@ -8,6 +8,8 @@ import com.cgwx.data.dto.UploadFileReturn;
 import com.cgwx.data.entity.*;
 import com.cgwx.service.IProductArchiveService;
 import com.cgwx.service.IProductDownloadService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
@@ -16,8 +18,15 @@ import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.impl.xb.xsdschema.Public;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.json.XML;
+import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -84,6 +93,8 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     @Autowired
     PdmUserInfoMapper pdmUserInfoMapper;
 
+    @Autowired
+    PdmAdvancedProductShpInfoMapper pdmAdvancedProductShpInfoMapper;
 
     @Override/*上传文件*/
     public UploadFileReturn uploadFile(MultipartFile file) {
@@ -355,7 +366,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         return files;
     }
 
-    @Override/*获取专题多期产品中二级目录中的目录结构*/
+    @Override/*获取专题多期产品中二级目录中的目录结构，并且写入归档缓存表以及归档记录*/
     public SecondaryFileStructure getSecondaryFileStructureAndWriteCheckTable(String path,String archivePersonnel,int type) {
 
         List<String> files = new ArrayList<String>();
@@ -414,6 +425,31 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         System.out.println("路径是："+path.substring(path.lastIndexOf('\\')+1));
         //操作一波归档记录表
         return secondaryFileStructure;
+    }
+
+
+    @Override
+    public String writeArchiveRecordAndWriteArchiveCheckInfo(String path,String archivePersonnel,int type){
+
+        String tempId = getUUId();
+        PdmArchiveCheckInfo pdmArchiveCheckInfo = new PdmArchiveCheckInfo();
+        pdmArchiveCheckInfo.setTemporaryPath(path);
+        pdmArchiveCheckInfo.setProductId(tempId);
+        pdmArchiveCheckInfo.setFileName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveCheckInfo.setStatus(0);
+        pdmArchiveCheckInfoMapper.insert(pdmArchiveCheckInfo);
+        //操作一波归档记录表
+        PdmArchiveRecordsInfo pdmArchiveRecordsInfo = new PdmArchiveRecordsInfo();
+        pdmArchiveRecordsInfo.setArchiveResult(0);
+        pdmArchiveRecordsInfo.setArchivePersonnel(archivePersonnel);
+        pdmArchiveRecordsInfo.setProductName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveRecordsInfo.setArchiveType(type);
+        pdmArchiveRecordsInfo.setProductId(tempId);
+        pdmArchiveRecordsInfo.setArchiveTime(new Date());
+        pdmArchiveRecordsInfoMapper.insert(pdmArchiveRecordsInfo);
+        System.out.println("路径是："+path.substring(path.lastIndexOf('\\')+1));
+        //操作一波归档记录表
+        return tempId;
     }
 
     @Override/*获取专题多期产品中二级目录中的目录结构*/
@@ -555,12 +591,12 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     @Override/**/
-    public int updateProductInfoForTheme(PdmProductInfo pdmProductInfo){
+    public int updateProductInfo(PdmProductInfo pdmProductInfo){
        return pdmProductInfoMapper.insert(pdmProductInfo);
     }
 
     @Override/**/
-    public String getThemeticProductName(String tempId){
+    public String getProductName(String tempId){
 
         return pdmArchiveCheckInfoMapper.selectFileNameById(tempId);
     }
@@ -614,15 +650,19 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     @Override
-    public List<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel){
+    public PageInfo<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel,int curPageNum, int maxResult,String productName,int archiveType,int archiveStatus){
 
-        return pdmArchiveRecordsInfoMapper.selectArchiveRecordsByArchivePersonnel(archivePersonnel);
+        PageHelper.startPage(curPageNum, maxResult);
+        List<PdmArchiveRecordsInfo> pdmArchiveRecords = pdmArchiveRecordsInfoMapper.selectArchiveRecordsByArchivePersonnel(archivePersonnel,productName,archiveType,archiveStatus);
+        PageInfo<PdmArchiveRecordsInfo> pageInfo = new PageInfo<>(pdmArchiveRecords);
+//        System.out.println("条目数为："+pageInfo.getList().size());
+        return pageInfo;
     }
 
     @Override
-    public int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo,String tempId){
+    public int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo,String tempId,int productType){
 
-        pdmArchiveRecordsInfoMapper.updateArchiveRecordsInfo(pdmArchiveRecordsInfo.getProductId(),pdmArchiveRecordsInfo.getArchiveResult(),tempId);
+        pdmArchiveRecordsInfoMapper.updateArchiveRecordsInfo(pdmArchiveRecordsInfo.getProductId(),pdmArchiveRecordsInfo.getArchiveResult(),tempId,productType);
         return 1;
     }
 
@@ -631,4 +671,39 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
 
         return pdmUserInfoMapper.selectUserNameByUserId(archivePersonnel);
     }
+
+    @Override
+    public int updateOrthoProduct(PdmOrthoProductInfo pdmOrthoProductInfo){
+
+        return pdmOrthoProductInfoMapper.insert(pdmOrthoProductInfo);
+    }
+
+    @Override
+    public int updateInlayProduct(PdmInlayProductInfo pdmInlayProductInfo){
+
+        return pdmInlayProductInfoMapper.insert(pdmInlayProductInfo);
+    }
+
+    @Override
+    public int updateSubdivisionProduct(PdmSubdivisionProductInfo pdmSubdivisionProductInfo){
+
+        return pdmSubdivisionProductInfoMapper.insert(pdmSubdivisionProductInfo);
+    }
+
+
+    @Override
+    public int updateAdvancedProductShpInfo(PdmAdvancedProductShpInfo pdmAdvancedProductShpInfo){
+
+        return pdmAdvancedProductShpInfoMapper.insert(pdmAdvancedProductShpInfo);
+}
+
+    @Override
+    public String xml2jsonString(String path) throws JSONException, IOException {
+        File file= new File(path);
+        InputStream in =new FileInputStream(file);
+        String xml = IOUtils.toString(in);
+        return XML.toJSONObject(xml).toString();
+    }
+
+
 }

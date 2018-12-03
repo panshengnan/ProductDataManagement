@@ -63,4 +63,12 @@ public class UserController {
         return ResultUtil.success(userService.modifyPasswdByAccount(account,passwd));
     }
 
+    @RequestMapping(value = "/getUserList")
+    @CrossOrigin(methods = RequestMethod.GET)
+    @ResponseBody
+    public Result getUserList(){
+
+        return ResultUtil.success(userService.getUserList());
+    }
+
 }
