@@ -826,6 +826,7 @@ public class MetadataServiceImpl implements IMetadataService {
     {
         List<AdvanceProductSimpleInfo> advanceProductSimpleInfoList=new ArrayList<AdvanceProductSimpleInfo>();
         PageHelper.startPage(advanceProductCri.getCurPageNum(),advanceProductCri.getMaxResultNum());
+        System.out.println(advanceProductCri.getImage_geo());
         advanceProductSimpleInfoList=pdmOrthoProductInfoMapper.selectSimpleinfoByAllconditions(advanceProductCri.getProducer(),advanceProductCri.getImage_geo(),advanceProductCri.getDeliverName(),advanceProductCri.getProduceArea(),advanceProductCri.getDeliverMethod(),advanceProductCri.getProduceStartTime(),advanceProductCri.getProduceEndTime(),advanceProductCri.getDeliverStartTime(),advanceProductCri.getDeliverEndTime(),advanceProductCri.getProductName(),advanceProductCri.isOrtho(),advanceProductCri.isInlay(),advanceProductCri.isSubdivision());
         for (int i=0;i<advanceProductSimpleInfoList.size();i++)
         {

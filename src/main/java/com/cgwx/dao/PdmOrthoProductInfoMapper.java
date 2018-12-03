@@ -272,8 +272,8 @@ public interface PdmOrthoProductInfoMapper {
             "<if test='null!= producer &amp; !\"\".equals(producer)'>"
             + "and producer like CONCAT('%',#{producer},'%') "
             +"</if>"
-            +"<if test='null!=image_geo '>"
-            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"<if test='null!=imagegeo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{imagegeo}))=false"
             +"</if>"
             +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
             + "and ortho_product_name like CONCAT('%',#{product_name},'%') "
@@ -315,8 +315,8 @@ public interface PdmOrthoProductInfoMapper {
             "<if test='null!= producer &amp; !\"\".equals(producer)'>"
             + "and producer like CONCAT('%',#{producer},'%') "
             +"</if>"
-            +"<if test='null!=image_geo '>"
-            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"<if test='null!=imagegeo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{imagegeo}))=false"
             +"</if>"
             +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
             + "and inlay_product_name like CONCAT('%',#{product_name},'%') "
@@ -358,8 +358,8 @@ public interface PdmOrthoProductInfoMapper {
             "<if test='null!= producer &amp; !\"\".equals(producer)'>"
             + "and producer like CONCAT('%',#{producer},'%') "
             +"</if>"
-            +"<if test='null!=image_geo '>"
-            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
+            +"<if test='null!=imagegeo '>"
+            +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{imagegeo}))=false"
             +"</if>"
             +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
             + "and subdivision_product_name like CONCAT('%',#{product_name},'%') "
@@ -404,7 +404,7 @@ public interface PdmOrthoProductInfoMapper {
             property = "productName"
     )})
     List<AdvanceProductSimpleInfo> selectSimpleinfoByAllconditions(@Param("producer")String producer,
-                                                                   @Param("image_geo")Object image_geo,
+                                                                   @Param("imagegeo")Object image_geo,
                                                                    @Param("deliver_name")String deliverName,
                                                                    @Param("produce_area")String produceArea,
                                                                    @Param("deliver_method")String deliverMethod,

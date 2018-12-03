@@ -163,7 +163,7 @@ public interface PdmThemeticProductDetailInfoMapper {
 
     @Select({"SELECT single_period_product_id\n" +
             "FROM pdm_themetic_product_detail_info\n" +
-            "WHERE product_id = #{productId}"
+            "WHERE product_id = #{productId} order by single_period_product_name collate \"C\""
     })
 
 
