@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmAdvancedProductShpInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmAdvancedProductShpInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="image_sourc" property="imageSourc" jdbcType="VARCHAR" />
+    <result column="image_file" property="imageFile" jdbcType="VARCHAR" />
+    <result column="acquisitio" property="acquisitio" jdbcType="VARCHAR" />
+    <result column="sensor" property="sensor" jdbcType="VARCHAR" />
+    <result column="num_channel" property="numChannel" jdbcType="VARCHAR" />
+    <result column="chan_type" property="chanType" jdbcType="VARCHAR" />
+    <result column="cloud_cover" property="cloudCover" jdbcType="VARCHAR" />
+    <result column="islands" property="islands" jdbcType="VARCHAR" />
+    <result column="image_geometry" property="imageGeometry" jdbcType="OTHER" />
+    <result column="block_id" property="blockId" jdbcType="INTEGER" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmAdvancedProductShpInfo" >
+    insert into pdm_advanced_product_shp_info (product_id, image_sourc, image_file, 
+      acquisitio, sensor, num_channel, 
+      chan_type, cloud_cover, islands, 
+      image_geometry, block_id)
+    values (#{productId,jdbcType=VARCHAR}, #{imageSourc,jdbcType=VARCHAR}, #{imageFile,jdbcType=VARCHAR}, 
+      #{acquisitio,jdbcType=VARCHAR}, #{sensor,jdbcType=VARCHAR}, #{numChannel,jdbcType=VARCHAR}, 
+      #{chanType,jdbcType=VARCHAR}, #{cloudCover,jdbcType=VARCHAR}, #{islands,jdbcType=VARCHAR}, 
+      st_geomfromgeojson(#{imageGeometry,jdbcType=OTHER}), #{blockId,jdbcType=INTEGER})
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, image_sourc, image_file, acquisitio, sensor, num_channel, chan_type, 
+    cloud_cover, islands, image_geometry, block_id
+    from pdm_advanced_product_shp_info
+  </select>
+</mapper>

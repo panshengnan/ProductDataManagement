@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmProductLayerInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmProductLayerInfo" >
+    <result column="product_id" property="productId" jdbcType="VARCHAR" />
+    <result column="single_id" property="singleId" jdbcType="VARCHAR" />
+    <result column="layer_name" property="layerName" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmProductLayerInfo" >
+    insert into pdm_product_layer_info (product_id, single_id, layer_name
+      )
+    values (#{productId,jdbcType=VARCHAR}, #{singleId,jdbcType=VARCHAR}, #{layerName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select product_id, single_id, layer_name
+    from pdm_product_layer_info
+  </select>
+</mapper>
