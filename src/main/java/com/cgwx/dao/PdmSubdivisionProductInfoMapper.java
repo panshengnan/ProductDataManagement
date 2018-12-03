@@ -12,6 +12,7 @@ import com.cgwx.data.entity.PdmSubdivisionProductInfo;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -174,15 +175,33 @@ public interface PdmSubdivisionProductInfoMapper {
             +"<if test='null!=image_geo '>"
             +"and  st_disjoint(st_geomfromgeojson(st_asgeojson(image_geo)),st_geomfromgeojson(#{image_geo}))=false"
             +"</if>"
+            +"<if test='null!= product_name &amp; !\"\".equals(product_name)'>"
+            + "and subdivision_product_name like CONCAT('%',#{product_name},'%') "
+            +"</if>"
             +"and product_id IN ("
             + "SELECT product_id \n" +
             "            FROM pdm_product_info \n" +
             "            WHERE 1=1 \n" +
-            "<if test='null!= client_name &amp; !\"\".equals(client_name)'>"
-            + "and client_name like CONCAT('%',#{client_name},'%')"
+            "<if test='null!= deliver_name &amp; !\"\".equals(deliver_name)'>"
+            + "and deliver_name = #{deliver_name}"
             + "</if>"
-            + "<if test='null!= productDescription &amp; !\"\".equals(productDescription)'>"
-            + "and product_description like CONCAT('%',#{productDescription},'%')"
+            + "<if test='null!= produce_area &amp; !\"\".equals(produce_area)'>"
+            + "and produce_area = #{produce_area}"
+            + "</if>"
+            + "<if test='null!= deliver_method &amp; !\"\".equals(deliver_method)'>"
+            + "and deliver_method = #{deliver_method}"
+            + "</if>"
+            + "<if test='null!= produceStartTime'>"
+            + "and produce_time  &gt;= #{produceStartTime}"
+            + "</if>"
+            + "<if test='null!= produceEndTime'>"
+            + "and produce_time  &lt;= #{produceEndTime}"
+            + "</if>"
+            + "<if test='null!= deliverStartTime'>"
+            + "and deliver_time  &gt;= #{deliverStartTime}"
+            + "</if>"
+            + "<if test='null!= deliverEndTime'>"
+            + "and deliver_time  &lt;= #{deliverEndTime}"
             + "</if>"
             +")"
             +"</script>")
@@ -199,6 +218,12 @@ public interface PdmSubdivisionProductInfoMapper {
     )})
     List<AdvanceProductSimpleInfo> selectSimpleinfoByconditions(@Param("producer")String producer,
                                                                 @Param("image_geo")Object image_geo,
-                                                                @Param("client_name")String clientName,
-                                                                @Param("productDescription")String description);
+                                                                @Param("deliver_name")String deliverName,
+                                                                @Param("produce_area")String produceArea,
+                                                                @Param("deliver_method")String deliverMethod,
+                                                                @Param("produceStartTime") Date produceStartTime,
+                                                                @Param("produceEndTime") Date produceEndTime,
+                                                                @Param("deliverStartTime") Date deliverStartTime,
+                                                                @Param("deliverEndTime") Date deliverEndTime,
+                                                                @Param("product_name")String productName);
 }

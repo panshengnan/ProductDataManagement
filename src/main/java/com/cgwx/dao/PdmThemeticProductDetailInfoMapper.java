@@ -163,7 +163,7 @@ public interface PdmThemeticProductDetailInfoMapper {
 
     @Select({"SELECT single_period_product_id\n" +
             "FROM pdm_themetic_product_detail_info\n" +
-            "WHERE product_id = #{productId}"
+            "WHERE product_id = #{productId} order by single_period_product_name collate \"C\""
     })
 
 
@@ -216,4 +216,22 @@ public interface PdmThemeticProductDetailInfoMapper {
             +" where product_id = #{productId} and single_period_product_id = #{singleId} "
     })
     void updateThemeticProductDetailImgGeo(@Param("productId") String productId,@Param("singleId") String singleId,@Param("geoJson") String geoJson);
+
+
+    @Select({"SELECT product_id,st_asgeojson(image_geo) as geo,single_period_product_id\n" +
+            "            FROM pdm_themetic_product_detail_info\n"+
+            "            WHERE product_id=#{productId}"
+    })
+    @Results({@Result(
+            column = "geo",
+            property = "imageGeo"
+
+    ), @Result(
+            column = "product_id",
+            property = "productId"
+    ), @Result(
+            column = "single_period_product_id",
+            property = "singlePeriodId")
+    })
+    List<ThemeticProductSimpleInfo> selectSimpleinfoById(@Param("productId")String productId);
 }

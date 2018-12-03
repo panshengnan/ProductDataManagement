@@ -9,20 +9,38 @@ public class ThemeticProductDetail {
 
     private String themeticProductName;
 
-    private String industry;
+    private  List<Industry> industry;
 
 //    private String parentDirectory;
 
     private String countOfPeriods;
 
+    public void setIndustry(List<Industry> industry) {
+        this.industry = industry;
+    }
+
+    public List<Industry> getIndustry() {
+        return industry;
+    }
+
     private  String productDescription;
 
     private String clientName;
 
-    private String delieverName;
+    private String deliverName;
 
-    private Date delieverTime;
+    private Date deliverTime;
     private String analysisReportUrl;
+
+    public void setDocAnalysisReportUrl(String docAnalysisReportUrl) {
+        this.docAnalysisReportUrl = docAnalysisReportUrl;
+    }
+
+    public String getDocAnalysisReportUrl() {
+        return docAnalysisReportUrl;
+    }
+
+    private String docAnalysisReportUrl;
     private String allFileDownloadUrl;
 
     public void setAnalysisReportUrl(String analysisReportUrl) {
@@ -60,14 +78,6 @@ public class ThemeticProductDetail {
         this.themeticProductName = themeticProductName == null ? null : themeticProductName.trim();
     }
 
-    public String getIndustry() {
-        return industry;
-    }
-
-    public void setIndustry(String industry) {
-        this.industry = industry == null ? null : industry.trim();
-    }
-
     public String getCountOfPeriods() {
         return countOfPeriods;
     }
@@ -95,20 +105,20 @@ public class ThemeticProductDetail {
         this.clientName = clientName == null ? null : clientName.trim();
     }
 
-    public String getDelieverName() {
-        return delieverName;
+    public String getDeliverName() {
+        return deliverName;
     }
 
-    public void setDelieverName(String delieverName) {
-        this.delieverName = delieverName == null ? null : delieverName.trim();
+    public void setDeliverName(String deliverName) {
+        this.deliverName = deliverName == null ? null : deliverName.trim();
     }
 
-    public Date getDelieverTime() {
-        return delieverTime;
+    public Date getDeliverTime() {
+        return deliverTime;
     }
 
-    public void setDelieverTime(Date delieverTime) {
-        this.delieverTime = delieverTime == null ? null : delieverTime;
+    public void setDeliverTime(Date deliverTime) {
+        this.deliverTime = deliverTime == null ? null : deliverTime;
     }
 
 

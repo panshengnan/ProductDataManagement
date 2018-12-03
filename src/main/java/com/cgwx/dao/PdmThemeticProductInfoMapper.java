@@ -23,7 +23,7 @@ public interface PdmThemeticProductInfoMapper {
     @Select({"SELECT parent_directory\nFROM pdm_themetic_product_info \nWHERE  product_id = #{productId}"})
     String selectFilePathByProductId(@Param("productId") String var1);
 
-    @Select({"SELECT product_id, themetic_product_name, industry, parent_directory, is_multi_period, \n" +
+    @Select({"SELECT product_id, themetic_product_name,  parent_directory, is_multi_period, \n" +
             "          client_name, deliever_name,deliever_time,gmt_created,gmt_modified\n" +
             "            FROM pdm_themetic_product_info\n" +
             "            WHERE product_id = #{productId}"
@@ -34,9 +34,6 @@ public interface PdmThemeticProductInfoMapper {
     ), @Result(
             column = "themetic_product_name",
             property = "themeticProductName"
-    ), @Result(
-            column = "industry",
-            property = "industry"
     ), @Result(
             column = "parent_directory",
             property = "parentDirectory"

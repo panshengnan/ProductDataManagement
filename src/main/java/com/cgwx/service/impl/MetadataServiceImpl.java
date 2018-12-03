@@ -4,8 +4,10 @@ import com.cgwx.dao.*;
 import com.cgwx.data.dto.*;
 import com.cgwx.data.entity.*;
 import com.cgwx.service.IMetadataService;
+import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -40,6 +42,15 @@ public class MetadataServiceImpl implements IMetadataService {
 
     @Autowired
     IProductDownloadServiceImpl iProductDownloadService;
+    @Autowired
+    PdmProductStoreLinkInfoMapper pdmProductStoreLinkInfoMapper;
+    @Autowired
+    PdmAdvancedProductShpInfoMapper pdmAdvancedProductShpInfoMapper;
+    @Autowired
+    PdmProductLayerInfoMapper pdmProductLayerInfoMapper;
+
+    @Value("${productStoreLinkHead}")
+    private String productStoreLinkHead;//拼链接
 
     @Override
    //単期产品详情
@@ -50,7 +61,15 @@ public class MetadataServiceImpl implements IMetadataService {
         SinglePeriodThemeticProductDetail singlePeriodThemeticProductDetail =new SinglePeriodThemeticProductDetail();
         singlePeriodThemeticProductDetail.setSinglePeriodProductId(singlePeriodProductId);
         //System.err.print(" "+themeticProductDetailPart2.getProducer());
-        singlePeriodThemeticProductDetail.setImageGeo(themeticProductDetailPart2.getImageGeo().toString());
+        if(themeticProductDetailPart2.getImageGeo()==null)
+        {
+            singlePeriodThemeticProductDetail.setImageGeo(null);
+        }
+        else
+        {
+            singlePeriodThemeticProductDetail.setImageGeo(themeticProductDetailPart2.getImageGeo().toString());
+        }
+
         singlePeriodThemeticProductDetail.setProducer(themeticProductDetailPart2.getProducer());
         singlePeriodThemeticProductDetail.setSatellite(themeticProductDetailPart2.getSatellite());
         singlePeriodThemeticProductDetail.setSensor(themeticProductDetailPart2.getSensor());
@@ -84,16 +103,21 @@ public class MetadataServiceImpl implements IMetadataService {
         //获取文件列表和对应的URL
         String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\1";
         List<FileUrl> themeticUrlList = getFileListAndUrl(productId,singlePeriodProductId);
-        singlePeriodThemeticProductDetail.setFileListAndUrl(themeticUrlList);
-        for(int a=0;a<themeticUrlList.size();a++) {
+        singlePeriodThemeticProductDetail.setLayerName(pdmProductLayerInfoMapper.getThemeticProductLayerName(productId,singlePeriodProductId));
+        for(int a=themeticUrlList.size()-1;a>=0;a--) {
             if(themeticUrlList.get(a).getFileName().contains("jpg"))
             {
                 System.out.println("removejpg"+themeticUrlList.get(a).getFileName());
-                singlePeriodThemeticProductDetail.setThumbnailUrl(themeticUrlList.get(a).getFileUrl());
+                singlePeriodThemeticProductDetail.setThumbnailUrl(productStoreLinkHead+themeticUrlList.get(a).getFileUrl());
                 themeticUrlList.remove(a);
-                break;
             }
+            else
+            {
+                themeticUrlList.get(a).setFileUrl(productStoreLinkHead+themeticUrlList.get(a).getFileUrl());
+            }
+
         }
+        singlePeriodThemeticProductDetail.setFileListAndUrl(themeticUrlList);
 
         return singlePeriodThemeticProductDetail;
     }
@@ -124,30 +148,41 @@ public class MetadataServiceImpl implements IMetadataService {
     public ThemeticProductDetail getThemeticProductDetail (String productId, List<String> singlePeriodProductIdList) {
        // System.err.println("id"+productId);
         ThemeticProductDetail themeticProductDetail =new ThemeticProductDetail();
-        PdmThemeticProductInfo themeticProductDetailPart1= pdmThemeticProductInfoMapper.selectThemeticProductDetailPart1ByProductId(productId);
+        PdmProductInfo themeticProductDetailPart1= pdmProductInfoMapper.selectProductDetailPart1ByProductId(productId);
         if(themeticProductDetailPart1==null)
         {
             System.out.println("no product");
             return  themeticProductDetail;
         }
         themeticProductDetail.setProductId(themeticProductDetailPart1.getProductId());
-        themeticProductDetail.setThemeticProductName(themeticProductDetailPart1.getThemeticProductName());
-        themeticProductDetail.setIndustry(themeticProductDetailPart1.getIndustry());
+        themeticProductDetail.setThemeticProductName(themeticProductDetailPart1.getProductName());
+        //themeticProductDetail.setIndustry(themeticProductDetailPart1.getIndustry());
        // System.err.println(themeticProductDetailPart1.getProductId()+" -"+themeticProductDetailPart1.getThemeticProductName()+" -"+themeticProductDetailPart1.getIndustry());
         themeticProductDetail.setCountOfPeriods(pdmThemeticProductDetailInfoMapper.countSinglePeriodThemeticProductId(productId).toString());
        // System.err.println("peri"+themeticProductDetail.getCountOfPeriods());
         themeticProductDetail.setProductDescription(pdmProductInfoMapper.selectProductDescriptionByProductId(productId));
 
         themeticProductDetail.setClientName(themeticProductDetailPart1.getClientName());
-        themeticProductDetail.setDelieverName(themeticProductDetailPart1.getDelieverName());
-        themeticProductDetail.setDelieverTime(themeticProductDetailPart1.getDelieverTime());
+        themeticProductDetail.setDeliverName(themeticProductDetailPart1.getDeliverName());
+        themeticProductDetail.setDeliverTime(themeticProductDetailPart1.getDeliverTime());
+        themeticProductDetail.setIndustry(getIndustryByProductid(productId));
         //获取分析报告路径
         //String parentDirect=iProductDownloadService.getEntityFilePath(productId);
-        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-        themeticProductDetail.setAnalysisReportUrl(path1);
+       // String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
+        themeticProductDetail.setAnalysisReportUrl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAnalysisReporturl(productId));
+        String docpath=pdmProductStoreLinkInfoMapper.selectProductDocAnalysisReporturl(productId);
+        //System.out.println("docpath:"+docpath);
+        if(docpath==null)
+        {
+            themeticProductDetail.setDocAnalysisReportUrl(null);
+        }
+        else
+        {
+            themeticProductDetail.setDocAnalysisReportUrl(productStoreLinkHead+docpath);
+        }
         //获取全部文件URL
-        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        themeticProductDetail.setAllFileDownloadUrl(path4);
+       // String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
+        themeticProductDetail.setAllFileDownloadUrl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(productId));
         Integer size=pdmThemeticProductDetailInfoMapper.countSinglePeriodThemeticProductId(productId);
        // System.err.println("size"+size);
         List<SinglePeriodThemeticProductDetail> list =new ArrayList<>();
@@ -162,78 +197,74 @@ public class MetadataServiceImpl implements IMetadataService {
     @Override
     //正射产品详情
    public OrthoProductDetail getOrthoProductDetail(String productId){
-       PdmOrthoProductInfo pdmOrthoProductInfo = pdmOrthoProductInfoMapper.selectOrthoProductDetailByProductId(productId);
-       OrthoProductDetail orthoProductDetail=new OrthoProductDetail();
-       orthoProductDetail.setProductId(pdmOrthoProductInfo.getProductId());
-       orthoProductDetail.setOrthoProductName(pdmOrthoProductInfo.getOrthoProductName());
-       orthoProductDetail.setImageGeo(pdmOrthoProductInfo.getImageGeo().toString());
-       orthoProductDetail.setProducer(pdmOrthoProductInfo.getProducer());
-       orthoProductDetail.setGeographicInfo(pdmOrthoProductInfo.getGeographicInfo());
-       orthoProductDetail.setSatellite(pdmOrthoProductInfo.getSatellite());
-       orthoProductDetail.setSensor(pdmOrthoProductInfo.getSensor());
-       if(pdmOrthoProductInfo.getResolution()==null)
-       {
-           orthoProductDetail.setResolution(null);
-       }
-       else
-       {
-           orthoProductDetail.setResolution(pdmOrthoProductInfo.getResolution().toString());
-       }
+  //      OrthoProductDetail pdmOrthoProductInfo = pdmOrthoProductInfoMapper.selectOrthoProductDetailByProductId(productId);
+//       OrthoProductDetail orthoProductDetail=new OrthoProductDetail();
+//       orthoProductDetail.setProductId(pdmOrthoProductInfo.getProductId());
+//       orthoProductDetail.setProductName(pdmOrthoProductInfo.getProductName());
+//       if(pdmOrthoProductInfo.getImageGeo()!=null)
+//       {
+//           orthoProductDetail.setImageGeo(pdmOrthoProductInfo.getImageGeo().toString());
+//       }
+//       else
+//       {
+//           orthoProductDetail.setImageGeo(null);
+//       }
+//        orthoProductDetail.setBands(pdmOrthoProductInfo.getBands());
+//        orthoProductDetail.setReceiveStation(pdmOrthoProductInfo.getReceiveStation());
+//        orthoProductDetail.setReceiveTime(pdmOrthoProductInfo.getReceiveTime());
+//        orthoProductDetail.setSwingSatelliteAngle(pdmOrthoProductInfo.getSwingSatelliteAngle());
+//        //if(pdmOrthoProductInfo.getCloudPercent()!=null)
+//       // {
+//            //orthoProductDetail.setCloudPercent(null);
+//        orthoProductDetail.setCloudPercent(pdmOrthoProductInfo.getCloudPercent());
+//       // }
+//
+//
+//        orthoProductDetail.setCenterLatitude(pdmOrthoProductInfo.getCenterLatitude());
+//        orthoProductDetail.setCenterLongitude(pdmOrthoProductInfo.getCenterLongitude());
+//        orthoProductDetail.setCenterTime(pdmOrthoProductInfo.getCenterTime());
+//        orthoProductDetail.setWidthInMeters(pdmOrthoProductInfo.getWidthInMeters());
+//        orthoProductDetail.setHeightInMeters(pdmOrthoProductInfo.getHeightInMeters());
+//        orthoProductDetail.setProductQuality(pdmOrthoProductInfo.getProductQuality());
+//       orthoProductDetail.setProducer(pdmOrthoProductInfo.getProducer());
+//       orthoProductDetail.setGeographicInfo(pdmOrthoProductInfo.getGeographicInfo());
+//       orthoProductDetail.setSatellite(pdmOrthoProductInfo.getSatellite());
+//       orthoProductDetail.setSensor(pdmOrthoProductInfo.getSensor());
 
-       orthoProductDetail.setImageBreath(pdmOrthoProductInfo.getImageBreath());
-       SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-       if(pdmOrthoProductInfo.getCenterTime()==null)
-       {
-           orthoProductDetail.setCaptureTime(null);
-       }
-       else
-       {
-           orthoProductDetail.setCaptureTime(timeFormat.format(pdmOrthoProductInfo.getCenterTime()));
-       }
+        OrthoProductDetail orthoProductDetail=pdmOrthoProductInfoMapper.selectOrthoProductDetailByProductId(productId);
 
-       orthoProductDetail.setSizeOfTif(pdmOrthoProductInfo.getSizeOfTif());
-       orthoProductDetail.setClientName(pdmOrthoProductInfo.getClientName());
-       orthoProductDetail.setDelieverName(pdmOrthoProductInfo.getDelieverName());
-       orthoProductDetail.setDelieverTime(pdmOrthoProductInfo.getDelieverTime());
+        AdvanceProductPart1Info productInfo=pdmProductInfoMapper.selectAdvanceProductPart1ByProductId(productId);
+
+       orthoProductDetail.setDelieverName(productInfo.getDeliverName());
+       orthoProductDetail.setDelieverTime(productInfo.getDeliverTime());
+        orthoProductDetail.setDeliverMethod(productInfo.getDeliverMethod());
+        orthoProductDetail.setProduceArea(productInfo.getProcucerArea());
+        orthoProductDetail.setProduceTime(productInfo.getProduceTime());
+        orthoProductDetail.setLayerName(pdmProductLayerInfoMapper.getAdvanceProductLayerName(productId));
        orthoProductDetail.setProductType("ortho");
 
-       String path =pdmOrthoProductInfo.getOrthoProductDirectory();
-       //获取分析报告路径，后续需要改
-//       String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-//       orthoProductDetail.setAnalysisReportUrl(path1);
-//
-//       //获取文件列表和URL
-//       String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//       List<FileUrl> orthoUrlList = getFileListAndUrl(path3);
-//
-//       orthoProductDetail.setFileListAndUrl(orthoUrlList);
-//
-//
-       //获取全部文件URL
-       String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-       orthoProductDetail.setAllFileDownloadUrl(path4);
-//
-//       //获取缩略图url
-//       String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//       orthoProductDetail.setThumbnailUrl(path5);
+       //获取路径，后续需要改
         List<FileUrl> orthoUrlList = getFileListAndUrl(productId,null);
-
-        for(int a=0;a<orthoUrlList.size();a++)
+        int fileUrlSize=orthoUrlList.size();
+        for(int a=fileUrlSize-1;a>=0;a--)
         {
-            if(orthoUrlList.get(a).getFileName().contains("jpg"))
+//            System.out.println(  "size:"+orthoUrlList.size());
+            System.out.println(  "url:"+orthoUrlList.get(a).getFileUrl());
+
+            orthoUrlList.get(a).setFileUrl(productStoreLinkHead+orthoUrlList.get(a).getFileUrl());
+            if(orthoUrlList.get(a).getFileName().contains("thumb.jpg"))
             {
                 System.out.println("removejpg"+orthoUrlList.get(a).getFileName());
                 orthoProductDetail.setThumbnailUrl(orthoUrlList.get(a).getFileUrl());
                 orthoUrlList.remove(a);
 
-            }else if(orthoUrlList.get(a).getFileName().contains("pdf"))
-            {
-                System.out.println("removepdf"+orthoUrlList.get(a).getFileName());
-                orthoProductDetail.setAnalysisReportUrl(orthoUrlList.get(a).getFileUrl());
-                orthoUrlList.remove(a);
-
             }
-
+            else if(orthoUrlList.get(a).getFileName().contains("zip"))
+            {
+                System.out.println("removezip"+orthoUrlList.get(a).getFileName());
+                orthoProductDetail.setAllFileDownloadUrl(orthoUrlList.get(a).getFileUrl());
+                orthoUrlList.remove(a);
+            }
         }
         orthoProductDetail.setFileListAndUrl(orthoUrlList);
        return orthoProductDetail;
@@ -245,54 +276,55 @@ public class MetadataServiceImpl implements IMetadataService {
 
         InlayProductDetail inlayProductDetail=new InlayProductDetail();
         PdmInlayProductInfo pdmInlayProductInfo = pdmInlayProductInfoMapper.selectInlayProductDetailByProductId(productId);
+       AdvanceProductPart1Info productInfo=pdmProductInfoMapper.selectAdvanceProductPart1ByProductId(productId);
         inlayProductDetail.setProductId(pdmInlayProductInfo.getProductId());
-        inlayProductDetail.setInlayProductName(pdmInlayProductInfo.getInlayProductName());
-        inlayProductDetail.setImageGeo(pdmInlayProductInfo.getImageGeo().toString());
+        inlayProductDetail.setProductName(pdmInlayProductInfo.getInlayProductName());
+       if(pdmInlayProductInfo.getImageGeo()!=null)
+       {
+
+           inlayProductDetail.setImageGeo(pdmInlayProductInfo.getImageGeo().toString());
+       }
+       else
+       {
+           //System.out.println("igeo-null"+pdmInlayProductInfo.getImageGeo());
+           inlayProductDetail.setImageGeo(null);
+       }
         inlayProductDetail.setProducer(pdmInlayProductInfo.getProducer());
         inlayProductDetail.setGeographicInfo(pdmInlayProductInfo.getGeographicInfo());
-        inlayProductDetail.setSizeOfTif(pdmInlayProductInfo.getSizeOfTif());
-        inlayProductDetail.setClientName(pdmInlayProductInfo.getClientName());
-        inlayProductDetail.setDelieverName(pdmInlayProductInfo.getDelieverName());
-        inlayProductDetail.setDelieverTime(pdmInlayProductInfo.getDelieverTime());
+        inlayProductDetail.setDeliverMethod(productInfo.getDeliverMethod());
+       inlayProductDetail.setProduceArea(productInfo.getProcucerArea());
+       inlayProductDetail.setProduceTime(productInfo.getProduceTime());
+        inlayProductDetail.setDelieverName(productInfo.getDeliverName());
+        inlayProductDetail.setDelieverTime(productInfo.getDeliverTime());
         inlayProductDetail.setProductType("inlay");
-
-        String path =pdmInlayProductInfo.getInlayProductDirectory();
+        inlayProductDetail.setShpInfoList(pdmAdvancedProductShpInfoMapper.getshpInfoList(productId));
+       inlayProductDetail.setLayerName(pdmProductLayerInfoMapper.getAdvanceProductLayerName(productId));
+        //String path =pdmInlayProductInfo.getInlayProductDirectory();
         //获取分析报告路径，后续需要改
-//        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-//        inlayProductDetail.setAnalysisReportUrl(path1);
-//
-//        //获取文件列表和URL
-//        String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//        List<FileUrl> inlayUrlList = getFileListAndUrl(path3);
-//
-//        inlayProductDetail.setFileListAndUrl(inlayUrlList);
-//
-//
-        //获取全部文件URL
-        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        inlayProductDetail.setAllFileDownloadUrl(path4);
-//
-//        //获取缩略图url
-//        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//        inlayProductDetail.setThumbnailUrl(path5);
        List<FileUrl> inlayUrlList = getFileListAndUrl(productId,null);
+       int fileUrlSize=inlayUrlList.size();
+       for(int a=fileUrlSize-1;a>=0;a--)
+       {
+//           System.out.println(  "size:"+inlayUrlList.size());
+           System.out.println(  "url:"+inlayUrlList.get(a).getFileUrl());
 
-       for(int a=0;a<inlayUrlList.size();a++) {
-           if(inlayUrlList.get(a).getFileName().contains("jpg"))
+           inlayUrlList.get(a).setFileUrl(productStoreLinkHead+inlayUrlList.get(a).getFileUrl());
+           if(inlayUrlList.get(a).getFileName().contains("thumb.jpg"))
            {
                System.out.println("removejpg"+inlayUrlList.get(a).getFileName());
                inlayProductDetail.setThumbnailUrl(inlayUrlList.get(a).getFileUrl());
                inlayUrlList.remove(a);
 
-           }else if(inlayUrlList.get(a).getFileName().contains("pdf"))
+           }
+           else if(inlayUrlList.get(a).getFileName().contains(".zip"))
            {
-               System.out.println("removepdf"+inlayUrlList.get(a).getFileName());
-               inlayProductDetail.setAnalysisReportUrl(inlayUrlList.get(a).getFileUrl());
+               System.out.println("removezip"+inlayUrlList.get(a).getFileName());
+               inlayProductDetail.setAllFileDownloadUrl(inlayUrlList.get(a).getFileUrl());
                inlayUrlList.remove(a);
            }
-
        }
 
+        inlayProductDetail.setFileListAndUrl(inlayUrlList);
         return inlayProductDetail;
 
     }
@@ -301,16 +333,29 @@ public class MetadataServiceImpl implements IMetadataService {
     @Override
     public SubdivisionProductDetail getSubdivisionProductDetail(String productId) {
        PdmSubdivisionProductInfo pdmSubdivisionProductInfo=pdmSubdivisionProductInfoMapper.selectSubdivisionProductDetailByProductId(productId);
+        AdvanceProductPart1Info productInfo=pdmProductInfoMapper.selectAdvanceProductPart1ByProductId(productId);
        SubdivisionProductDetail subdivisionProductDetail =new SubdivisionProductDetail();
        subdivisionProductDetail.setProductId(productId);
-       subdivisionProductDetail.setSubdivisionProductName(pdmSubdivisionProductInfo.getSubdivisionProductName());
-       subdivisionProductDetail.setImageGeo(pdmSubdivisionProductInfo.getImageGeo().toString());
-       subdivisionProductDetail.setNumberOfTif(pdmSubdivisionProductInfo.getNumberOfTif().toString());
-       subdivisionProductDetail.setIndustry(pdmSubdivisionProductInfo.getIndustry());
+       subdivisionProductDetail.setProductName(pdmSubdivisionProductInfo.getSubdivisionProductName());
+        if(pdmSubdivisionProductInfo.getImageGeo()!=null)
+        {
+           // System.out.println("sgeo-null");
+            subdivisionProductDetail.setImageGeo(pdmSubdivisionProductInfo.getImageGeo().toString());
+        }
+        else
+        {
+           // System.out.println("sgeo-null"+pdmSubdivisionProductInfo.getImageGeo());
+            subdivisionProductDetail.setImageGeo(null);
+        }
+      // subdivisionProductDetail.setNumberOfTif(pdmSubdivisionProductInfo.getNumberOfTif().toString());
+      // subdivisionProductDetail.setIndustry(pdmSubdivisionProductInfo.getIndustry());
+       // PdmProductInfo productInfo=pdmProductInfoMapper.selectProductDetailPart1ByProductId(productId);
        subdivisionProductDetail.setProducer(pdmSubdivisionProductInfo.getProducer());
-       subdivisionProductDetail.setClientName(pdmSubdivisionProductInfo.getClientName());
-       subdivisionProductDetail.setDelieverName(pdmSubdivisionProductInfo.getDelieverName());
-       subdivisionProductDetail.setDelieverTime(pdmSubdivisionProductInfo.getDelieverTime());
+        subdivisionProductDetail.setDeliverMethod(productInfo.getDeliverMethod());
+        subdivisionProductDetail.setProduceArea(productInfo.getProcucerArea());
+        subdivisionProductDetail.setProduceTime(productInfo.getProduceTime());
+       subdivisionProductDetail.setDelieverName(productInfo.getDeliverName());
+       subdivisionProductDetail.setDelieverTime(productInfo.getDeliverTime());
        if(pdmSubdivisionProductInfo.getResolution()==null)
        {
            subdivisionProductDetail.setResolution(null);
@@ -322,43 +367,34 @@ public class MetadataServiceImpl implements IMetadataService {
 
        subdivisionProductDetail.setGeographicInfo(pdmSubdivisionProductInfo.getGeographicInfo());
        subdivisionProductDetail.setProductType("subdivision");
-
+        subdivisionProductDetail.setShpInfoList(pdmAdvancedProductShpInfoMapper.getshpInfoList(productId));
+        subdivisionProductDetail.setLayerName(pdmProductLayerInfoMapper.getAdvanceProductLayerName(productId));
        String path =pdmSubdivisionProductInfo.getSubdivisionProductDirectory();
         //获取分析报告路径，后续需要改
-//        String path1="C:\\pdm_bak\\专题产品\\长春市201309热岛效应\\长春市201309热岛效应.pdf";
-//        subdivisionProductDetail.setAnalysisReportUrl(path1);
-//
-//        //获取文件列表和URL
-//        String path3 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//        List<FileUrl> subdivisionUrlList = getFileListAndUrl(path3);
-//
-//        subdivisionProductDetail.setFileListAndUrl(subdivisionUrlList);
-//
-//
-        //获取全部文件URL
-        String path4 ="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-        subdivisionProductDetail.setAllFileDownloadUrl(path4);
-//
-//        //获取缩略图url
-//        String path5="C:\\pdm_bak\\专题产品\\长春市201309热岛效应";
-//        subdivisionProductDetail.setThumbnailUrl(path5);
-        List<FileUrl> subdivisionUrlList = getFileListAndUrl(productId,null);
 
-        for(int a=0;a<subdivisionUrlList.size();a++) {
-            if(subdivisionUrlList.get(a).getFileName().contains("jpg"))
+        List<FileUrl> subdivisionUrlList = getFileListAndUrl(productId,null);
+        int fileUrlSize=subdivisionUrlList.size();
+        for(int a=fileUrlSize-1;a>=0;a--)
+        {
+           // System.out.println(  "size:"+subdivisionUrlList.size());
+            System.out.println(  "url:"+subdivisionUrlList.get(a).getFileUrl());
+
+            subdivisionUrlList.get(a).setFileUrl(productStoreLinkHead+subdivisionUrlList.get(a).getFileUrl());
+            if(subdivisionUrlList.get(a).getFileName().contains("thumb.jpg"))
             {
                 System.out.println("removejpg"+subdivisionUrlList.get(a).getFileName());
                 subdivisionProductDetail.setThumbnailUrl(subdivisionUrlList.get(a).getFileUrl());
                 subdivisionUrlList.remove(a);
 
-            }else if(subdivisionUrlList.get(a).getFileName().contains("pdf"))
+            }
+            else if(subdivisionUrlList.get(a).getFileName().contains(".zip"))
             {
-                System.out.println("removepdf"+subdivisionUrlList.get(a).getFileName());
-                subdivisionProductDetail.setAnalysisReportUrl(subdivisionUrlList.get(a).getFileUrl());
+                System.out.println("removezip"+subdivisionUrlList.get(a).getFileName());
+                subdivisionProductDetail.setAllFileDownloadUrl(subdivisionUrlList.get(a).getFileUrl());
                 subdivisionUrlList.remove(a);
             }
-
         }
+        subdivisionProductDetail.setFileListAndUrl(subdivisionUrlList);
     return subdivisionProductDetail;
 
     }
@@ -509,13 +545,6 @@ public class MetadataServiceImpl implements IMetadataService {
        // System.out.println(themeticProductSimpleInfoList.get(0).getImageGeo());
         return themeticProductSimpleInfoList;
     }
-    @Override
-    public List<ThemeticProductSimpleInfo> testgetSimpleProductlist(int type){
-        List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList =new ArrayList<ThemeticProductSimpleInfo>();
-            themeticProductSimpleInfoList =pdmThemeticProductDetailInfoMapper.selectSimpleinfotest();
-
-        return themeticProductSimpleInfoList;
-    }
 
     @Override
     public List<String> getProductIdlist(String clientname,String description){
@@ -530,6 +559,38 @@ public class MetadataServiceImpl implements IMetadataService {
         List<String> productIdList=new ArrayList<String>();
         productIdList=pdmThemeticProductDetailIndustryInfoMapper.selectThemeticidByIndustry(level1,level2);
         return productIdList;
+    }
+
+
+    @Override
+    public List<ThemeticProductListByGeos>  getThemeticProductListByConditions(String clientname,String description,Object geo, String producer, List<Industry> industryList)
+    {
+        List<ThemeticProductListByGeos> themeticProductListByGeosList=new ArrayList<ThemeticProductListByGeos>();
+        String where="";
+        List<String> productIdlistFromIndustry=new ArrayList<String>();
+        if(industryList==null)
+        {
+          where="1=1";
+        }
+       else {
+            for(int i=0;i<industryList.size();i++)
+            {
+                if(industryList.get(i).getLevel2()!=10000)
+                {
+                    where=where+" or (industry_level1="+industryList.get(i).getLevel1()+" and industry_level2="+industryList.get(i).getLevel2()+")";
+                }
+                else
+                {
+                    where=where+" or (industry_level1="+industryList.get(i).getLevel1()+")";
+                }
+            }
+            where=where.substring(4,where.length());
+            System.out.println("where is"+where);
+        }
+        // List<String> industrytype=new ArrayList<String>();
+
+        themeticProductListByGeosList = pdmProductInfoMapper.getThemeticInfoByConditions(clientname,description,where,geo,producer);
+        return themeticProductListByGeosList;
     }
     @Override
     public void mergeThemeticSimpleInfoListByProductIdlist(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList, List<String>productIdlist)
@@ -591,51 +652,70 @@ public class MetadataServiceImpl implements IMetadataService {
             List<String> stringListtemp=getProductIdlistFromIndustry(10000,10000);
             return stringListtemp;
         }
+        String where="";
+       // List<String> industrytype=new ArrayList<String>();
         for(int i=0;i<industryList.size();i++)
         {
-            List<String> stringListtemp=getProductIdlistFromIndustry(industryList.get(i).getLevel1(),industryList.get(i).getLevel2());
-           // System.out.println("string"+stringListtemp);
-            if(stringListtemp.isEmpty())
+            if(industryList.get(i).getLevel2()!=10000)
             {
-                return null;
-            }
-            if (productIdlistFromIndustry.size()==0)
-            {
-                productIdlistFromIndustry=stringListtemp;
+                where=where+" or (industry_level1="+industryList.get(i).getLevel1()+" and industry_level2="+industryList.get(i).getLevel2()+")";
             }
             else
             {
-                for(int j=productIdlistFromIndustry.size()-1;j>=0;j--)
-                {
-                    boolean flag=false;
-                    for(int k=0;k<stringListtemp.size();k++)
-                    {
-                        if(productIdlistFromIndustry.get(j).equals(stringListtemp.get(k)))
-                        {
-                            flag=true;
-                            break;
-                        }
-                    }
-                    if(flag==false)
-                    {
-                        productIdlistFromIndustry.remove(j);
-                    }
-                }
+                where=where+" or (industry_level1="+industryList.get(i).getLevel1()+")";
             }
         }
+        where=where.substring(4,where.length());
+        System.out.println("where is"+where);
+        productIdlistFromIndustry=pdmThemeticProductDetailIndustryInfoMapper.selectThemeticidByIndustrylist(where);
+       // System.out.println("idlist is"+productIdlistFromIndustry);
+        productIdlistFromIndustry=removeRepeat(productIdlistFromIndustry);
+        //System.out.println("idlist is"+productIdlistFromIndustry);
+//        for(int i=0;i<industryList.size();i++)
+//        {
+//            List<String> stringListtemp=getProductIdlistFromIndustry(industryList.get(i).getLevel1(),industryList.get(i).getLevel2());
+//           // System.out.println("string"+stringListtemp);
+//            if(stringListtemp.isEmpty())
+//            {
+//                return null;
+//            }
+//            if (productIdlistFromIndustry.size()==0)
+//            {
+//                productIdlistFromIndustry=stringListtemp;
+//            }
+//            else
+//            {
+//                for(int j=productIdlistFromIndustry.size()-1;j>=0;j--)
+//                {
+//                    boolean flag=false;
+//                    for(int k=0;k<stringListtemp.size();k++)
+//                    {
+//                        if(productIdlistFromIndustry.get(j).equals(stringListtemp.get(k)))
+//                        {
+//                            flag=true;
+//                            break;
+//                        }
+//                    }
+//                    if(flag==false)
+//                    {
+//                        productIdlistFromIndustry.remove(j);
+//                    }
+//                }
+//            }
+//        }
         return productIdlistFromIndustry;
     }
     @Override
-    public List<ThemeticProductListByGeosResult> packetSingleThemeticProductToThemeticProduct(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList){
+    public List<ThemeticProductListByGeos> packetSingleThemeticProductToThemeticProduct(List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList){
 
-        List<ThemeticProductListByGeosResult> themeticProductListByGeosResultList=new ArrayList<ThemeticProductListByGeosResult>();
+        List<ThemeticProductListByGeos> themeticProductListByGeosResultList=new ArrayList<ThemeticProductListByGeos>();
         if(themeticProductSimpleInfoList==null||themeticProductSimpleInfoList.isEmpty())
         {
             return null;
         }
         while (themeticProductSimpleInfoList.isEmpty()==false)
         {
-            ThemeticProductListByGeosResult themeticProductListByGeosResulttemp=new ThemeticProductListByGeosResult();
+            ThemeticProductListByGeos themeticProductListByGeosResulttemp=new ThemeticProductListByGeos();
             List<ThemeticProductSimpleInfo> themeticProductListtemp =new ArrayList<ThemeticProductSimpleInfo>();
             String themeticProductIdtemp=themeticProductSimpleInfoList.get(0).getProductId();
             for(int i=themeticProductSimpleInfoList.size()-1;i>=0;i--)
@@ -670,24 +750,131 @@ public class MetadataServiceImpl implements IMetadataService {
         return industryList;
     }
     @Override
-    public List<AdvanceProductSimpleInfo> getAdvanceProductSimpleInfoList(String producer,Object image_geo,String clientName,String description)
+    public List<AdvanceProductSimpleInfo> getAdvanceProductSimpleInfoList(AdvanceProductCri advanceProductCri)
     {
+
+
         List<AdvanceProductSimpleInfo> advanceProductSimpleInfoList=new ArrayList<AdvanceProductSimpleInfo>();
         List<AdvanceProductSimpleInfo> advanceProductSimpleInfoListtemp1=new ArrayList<AdvanceProductSimpleInfo>();
         List<AdvanceProductSimpleInfo> advanceProductSimpleInfoListtemp2=new ArrayList<AdvanceProductSimpleInfo>();
-        advanceProductSimpleInfoList=pdmOrthoProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
-        advanceProductSimpleInfoListtemp1=pdmInlayProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
-        for (int i=0;i<advanceProductSimpleInfoListtemp1.size();i++)
+
+        if(advanceProductCri.isOrtho())
         {
-            advanceProductSimpleInfoList.add(advanceProductSimpleInfoListtemp1.get(i));
+            advanceProductSimpleInfoList=pdmOrthoProductInfoMapper.selectSimpleinfoByconditions(advanceProductCri.getProducer(),advanceProductCri.getImage_geo(),advanceProductCri.getDeliverName(),advanceProductCri.getProduceArea(),advanceProductCri.getDeliverMethod(),advanceProductCri.getProduceStartTime(),advanceProductCri.getProduceEndTime(),advanceProductCri.getDeliverStartTime(),advanceProductCri.getDeliverEndTime(),advanceProductCri.getProductName());
+            for(int i=0;i<advanceProductSimpleInfoList.size();i++)
+            {
+                advanceProductSimpleInfoList.get(i).setProductType("正射产品");
+            }
+            //System.out.println(advanceProductSimpleInfoList);
         }
-        advanceProductSimpleInfoListtemp2=pdmSubdivisionProductInfoMapper.selectSimpleinfoByconditions(producer,image_geo,clientName,description);
-        for (int i=0;i<advanceProductSimpleInfoListtemp2.size();i++)
+        if (advanceProductCri.isInlay())
         {
-            advanceProductSimpleInfoList.add(advanceProductSimpleInfoListtemp2.get(i));
+            advanceProductSimpleInfoListtemp1=pdmInlayProductInfoMapper.selectSimpleinfoByconditions(advanceProductCri.getProducer(),advanceProductCri.getImage_geo(),advanceProductCri.getDeliverName(),advanceProductCri.getProduceArea(),advanceProductCri.getDeliverMethod(),advanceProductCri.getProduceStartTime(),advanceProductCri.getProduceEndTime(),advanceProductCri.getDeliverStartTime(),advanceProductCri.getDeliverEndTime(),advanceProductCri.getProductName());
+            for (int i=0;i<advanceProductSimpleInfoListtemp1.size();i++)
+            {
+                advanceProductSimpleInfoListtemp1.get(i).setProductType("镶嵌产品");
+                advanceProductSimpleInfoList.add(advanceProductSimpleInfoListtemp1.get(i));
+            }
         }
+      if(advanceProductCri.isSubdivision())
+      {
+          advanceProductSimpleInfoListtemp2=pdmSubdivisionProductInfoMapper.selectSimpleinfoByconditions(advanceProductCri.getProducer(),advanceProductCri.getImage_geo(),advanceProductCri.getDeliverName(),advanceProductCri.getProduceArea(),advanceProductCri.getDeliverMethod(),advanceProductCri.getProduceStartTime(),advanceProductCri.getProduceEndTime(),advanceProductCri.getDeliverStartTime(),advanceProductCri.getDeliverEndTime(),advanceProductCri.getProductName());
+          for (int i=0;i<advanceProductSimpleInfoListtemp2.size();i++)
+          {
+              advanceProductSimpleInfoListtemp2.get(i).setProductType("分幅产品");
+              advanceProductSimpleInfoList.add(advanceProductSimpleInfoListtemp2.get(i));
+          }
+      }
+
+        for (int i=0;i<advanceProductSimpleInfoList.size();i++)
+        {
+            //System.out.println("id:"+advanceProductSimpleInfoList.get(i).getProductId());
+            List<String> urls=pdmProductStoreLinkInfoMapper.selectProductthumbnailUrlurl(advanceProductSimpleInfoList.get(i).getProductId());
+            //System.out.println("urllist:"+urls);
+            if(urls.isEmpty())
+            {
+                advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+"null");
+                advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+"null");
+            }
+            else if(urls.size()==2)
+            {
+                if(urls.get(0).contains("thumb.jpg"))
+                {
+                    advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+urls.get(0));
+                    advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+urls.get(1));
+                }
+                else
+                {
+                    advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+urls.get(1));
+                    advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+urls.get(0));
+                }
+            }
+            else  if(urls.size()==1)
+            {
+                advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+urls.get(0));
+                advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+urls.get(0));
+            }
+
+            advanceProductSimpleInfoList.get(i).setDownloadurl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(advanceProductSimpleInfoList.get(i).getProductId()));
+        }
+
         return advanceProductSimpleInfoList;
     }
+
+    @Override
+    public AdvanceProductSimpleInfoResult getAdvanceProductSimpleInfoListByConditions(AdvanceProductCri advanceProductCri)
+    {
+        List<AdvanceProductSimpleInfo> advanceProductSimpleInfoList=new ArrayList<AdvanceProductSimpleInfo>();
+        PageHelper.startPage(advanceProductCri.getCurPageNum(),advanceProductCri.getMaxResultNum());
+        System.out.println(advanceProductCri.getImage_geo());
+        advanceProductSimpleInfoList=pdmOrthoProductInfoMapper.selectSimpleinfoByAllconditions(advanceProductCri.getProducer(),advanceProductCri.getImage_geo(),advanceProductCri.getDeliverName(),advanceProductCri.getProduceArea(),advanceProductCri.getDeliverMethod(),advanceProductCri.getProduceStartTime(),advanceProductCri.getProduceEndTime(),advanceProductCri.getDeliverStartTime(),advanceProductCri.getDeliverEndTime(),advanceProductCri.getProductName(),advanceProductCri.isOrtho(),advanceProductCri.isInlay(),advanceProductCri.isSubdivision());
+        for (int i=0;i<advanceProductSimpleInfoList.size();i++)
+        {
+            int productType= pdmProductInfoMapper.selectProductTypeByProductId(advanceProductSimpleInfoList.get(i).getProductId());
+            //System.out.print(productType);
+            String  advancedProductType = pdmProductTypeInfoMapper.selectProductTypeDescriptionByProductType(productType);
+            advanceProductSimpleInfoList.get(i).setProductType(advancedProductType);
+            //System.out.println("id:"+advanceProductSimpleInfoList.get(i).getProductId());
+            List<String> urls=pdmProductStoreLinkInfoMapper.selectProductthumbnailUrlurl(advanceProductSimpleInfoList.get(i).getProductId());
+            //System.out.println("urllist:"+urls);
+            if(urls.isEmpty())
+            {
+                advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+"null");
+                advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+"null");
+            }
+            else if(urls.size()==2)
+            {
+                if(urls.get(0).contains("thumb.jpg"))
+                {
+                    advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+urls.get(0));
+                    advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+urls.get(1));
+                }
+                else
+                {
+                    advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+urls.get(1));
+                    advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+urls.get(0));
+                }
+            }
+            else  if(urls.size()==1)
+            {
+                advanceProductSimpleInfoList.get(i).setThumbUrl(productStoreLinkHead+urls.get(0));
+                advanceProductSimpleInfoList.get(i).setThumbnailUrl(productStoreLinkHead+urls.get(0));
+            }
+
+            advanceProductSimpleInfoList.get(i).setDownloadurl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(advanceProductSimpleInfoList.get(i).getProductId()));
+        }
+
+        PageInfo<AdvanceProductSimpleInfo> pageInfo = new PageInfo<>(advanceProductSimpleInfoList);
+        System.out.println("总条目数：" + pageInfo.getTotal());
+        System.out.println("总页数：" + pageInfo.getPages());
+        AdvanceProductSimpleInfoResult advanceProductSimpleInfoResult=new AdvanceProductSimpleInfoResult();
+        advanceProductSimpleInfoResult.setProductQueryList(advanceProductSimpleInfoList);
+        advanceProductSimpleInfoResult.setTotalItems(pageInfo.getTotal());
+        advanceProductSimpleInfoResult.setTotalPageNum(pageInfo.getPages());
+        return advanceProductSimpleInfoResult;
+
+    }
+
 
     public List<String> removeRepeat(List<String> stringList)
     {
@@ -706,7 +893,17 @@ public class MetadataServiceImpl implements IMetadataService {
         }
         return  returnstring;
     }
-
-
+    @Override
+    public List<String> getDeliverMethodList()
+    {
+        List<String> deliverMethodList=pdmProductInfoMapper.getDeliverMethodList();
+        return  deliverMethodList;
+    }
+    @Override
+    public List<String> getProduceAreaList()
+    {
+        List<String> produceAreaList=pdmProductInfoMapper.getProduceAreaList();
+        return  produceAreaList;
+    }
 }
 

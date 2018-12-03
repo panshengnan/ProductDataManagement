@@ -1,20 +1,20 @@
 package com.cgwx.data.dto;
 
+import java.util.Date;
 import java.util.List;
 
 public class SubdivisionProductDetail {
 
         private String productId;
 
-        private String subdivisionProductName;
+        private String productName;
 
         private String imageGeo;
 
 //        private String subdivisionProductDirectory;
 
-        private String numberOfTif;
+       // private String numberOfTif;
 
-        private String industry;
 
         private String producer;
 
@@ -22,13 +22,13 @@ public class SubdivisionProductDetail {
 
         private String delieverName;
 
-        private String delieverTime;
+        private Date delieverTime;
 
         private String resolution;
 
         private String geographicInfo;
 
-        private String analysisReportUrl;
+      //  private String analysisReportUrl;
 
         private String thumbnailUrl;
 
@@ -38,6 +38,54 @@ public class SubdivisionProductDetail {
 
         private String productType;
 
+        private String produceArea;
+
+        private Date produceTime;
+         private String deliverMethod;
+    private List<shpInfo> shpInfoList;
+    private String layerName;
+
+    public String getLayerName() {
+        return layerName;
+    }
+
+    public void setLayerName(String layerName) {
+        this.layerName = layerName;
+    }
+
+    public List<shpInfo> getShpInfoList() {
+        return shpInfoList;
+    }
+
+    public void setShpInfoList(List<shpInfo> shpInfoList) {
+        this.shpInfoList = shpInfoList;
+    }
+
+    public String getProduceArea() {
+        return produceArea;
+    }
+
+    public void setProduceArea(String produceArea) {
+        this.produceArea = produceArea;
+    }
+
+    public Date getProduceTime() {
+        return produceTime;
+    }
+
+    public void setProduceTime(Date produceTime) {
+        this.produceTime = produceTime;
+    }
+
+    public String getDeliverMethod() {
+        return deliverMethod;
+    }
+
+    public void setDeliverMethod(String deliverMethod) {
+        this.deliverMethod = deliverMethod;
+    }
+
+
         public String getProductId() {
             return productId;
         }
@@ -46,12 +94,12 @@ public class SubdivisionProductDetail {
             this.productId = productId == null ? null : productId.trim();
         }
 
-        public String getSubdivisionProductName() {
-            return subdivisionProductName;
+        public String getProductName() {
+            return productName;
         }
 
-        public void setSubdivisionProductName(String subdivisionProductName) {
-            this.subdivisionProductName = subdivisionProductName == null ? null : subdivisionProductName.trim();
+        public void setProductName(String productName) {
+            this.productName = productName == null ? null : productName.trim();
         }
 
         public String getImageGeo() {
@@ -70,21 +118,14 @@ public class SubdivisionProductDetail {
 //            this.subdivisionProductDirectory = subdivisionProductDirectory == null ? null : subdivisionProductDirectory.trim();
 //        }
 
-        public String getNumberOfTif() {
-            return numberOfTif;
-        }
+//        public String getNumberOfTif() {
+//            return numberOfTif;
+//        }
+//
+//        public void setNumberOfTif(String numberOfTif) {
+//            this.numberOfTif = numberOfTif;
+//        }
 
-        public void setNumberOfTif(String numberOfTif) {
-            this.numberOfTif = numberOfTif;
-        }
-
-        public String getIndustry() {
-            return industry;
-        }
-
-        public void setIndustry(String industry) {
-            this.industry = industry == null ? null : industry.trim();
-        }
 
         public String getProducer() {
             return producer;
@@ -110,15 +151,15 @@ public class SubdivisionProductDetail {
             this.delieverName = delieverName == null ? null : delieverName.trim();
         }
 
-        public String getDelieverTime() {
-            return delieverTime;
-        }
+    public void setDelieverTime(Date delieverTime) {
+        this.delieverTime = delieverTime;
+    }
 
-        public void setDelieverTime(String delieverTime) {
-            this.delieverTime = delieverTime == null ? null : delieverTime.trim();
-        }
+    public Date getDelieverTime() {
+        return delieverTime;
+    }
 
-        public String getResolution() {
+    public String getResolution() {
             return resolution;
         }
 
@@ -135,13 +176,13 @@ public class SubdivisionProductDetail {
         }
 
 
-        public String getAnalysisReportUrl(){
-            return analysisReportUrl;
-        }
-        public void setAnalysisReportUrl(String analysisReportUrl){
-            this.analysisReportUrl = analysisReportUrl == null ? null : analysisReportUrl.trim();
-
-        }
+//        public String getAnalysisReportUrl(){
+//            return analysisReportUrl;
+//        }
+//        public void setAnalysisReportUrl(String analysisReportUrl){
+//            this.analysisReportUrl = analysisReportUrl == null ? null : analysisReportUrl.trim();
+//
+//        }
 
         public String getThumbnailUrl(){
             return thumbnailUrl;

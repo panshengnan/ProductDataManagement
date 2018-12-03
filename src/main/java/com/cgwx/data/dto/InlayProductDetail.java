@@ -1,11 +1,12 @@
 package com.cgwx.data.dto;
 
+import java.util.Date;
 import java.util.List;
 
 public class InlayProductDetail {
         private String productId;
 
-        private String inlayProductName;
+        private String productName;
 
         private String imageGeo;
 
@@ -15,15 +16,15 @@ public class InlayProductDetail {
 
         private String geographicInfo;
 
-        private String sizeOfTif;
+      //  private String sizeOfTif;
 
         private String clientName;
 
         private String delieverName;
 
-        private String delieverTime;
+        private Date delieverTime;
 
-        private String analysisReportUrl;
+      //  private String analysisReportUrl;
 
         private String thumbnailUrl;
 
@@ -32,8 +33,51 @@ public class InlayProductDetail {
         private List<FileUrl> fileListAndUrl;
 
         private String productType;
+        private String produceArea;
+        private Date produceTime;
+        private String deliverMethod;
+        private List<shpInfo> shpInfoList;
+        private String layerName;
 
+    public String getLayerName() {
+        return layerName;
+    }
 
+    public void setLayerName(String layerName) {
+        this.layerName = layerName;
+    }
+
+    public List<shpInfo> getShpInfoList() {
+        return shpInfoList;
+    }
+
+    public void setShpInfoList(List<shpInfo> shpInfoList) {
+        this.shpInfoList = shpInfoList;
+    }
+
+    public String getProduceArea() {
+        return produceArea;
+    }
+
+    public void setProduceArea(String produceArea) {
+        this.produceArea = produceArea;
+    }
+
+    public Date getProduceTime() {
+        return produceTime;
+    }
+
+    public void setProduceTime(Date produceTime) {
+        this.produceTime = produceTime;
+    }
+
+    public String getDeliverMethod() {
+        return deliverMethod;
+    }
+
+    public void setDeliverMethod(String deliverMethod) {
+        this.deliverMethod = deliverMethod;
+    }
 
     public String getProductId() {
             return productId;
@@ -43,12 +87,12 @@ public class InlayProductDetail {
             this.productId = productId == null ? null : productId.trim();
         }
 
-        public String getInlayProductName() {
-            return inlayProductName;
+        public String getProductName() {
+            return productName;
         }
 
-        public void setInlayProductName(String inlayProductName) {
-            this.inlayProductName = inlayProductName == null ? null : inlayProductName.trim();
+        public void setProductName(String productName) {
+            this.productName = productName == null ? null : productName.trim();
         }
 
         public String getImageGeo() {
@@ -59,13 +103,6 @@ public class InlayProductDetail {
             this.imageGeo = imageGeo;
         }
 
-//        public String getInlayProductDirectory() {
-//            return inlayProductDirectory;
-//        }
-//
-//        public void setInlayProductDirectory(String inlayProductDirectory) {
-//            this.inlayProductDirectory = inlayProductDirectory == null ? null : inlayProductDirectory.trim();
-//        }
 
         public String getProducer() {
             return producer;
@@ -83,13 +120,13 @@ public class InlayProductDetail {
             this.geographicInfo = geographicInfo == null ? null : geographicInfo.trim();
         }
 
-        public String getSizeOfTif() {
-            return sizeOfTif;
-        }
-
-        public void setSizeOfTif(String sizeOfTif) {
-            this.sizeOfTif = sizeOfTif == null ? null : sizeOfTif.trim();
-        }
+//        public String getSizeOfTif() {
+//            return sizeOfTif;
+//        }
+//
+//        public void setSizeOfTif(String sizeOfTif) {
+//            this.sizeOfTif = sizeOfTif == null ? null : sizeOfTif.trim();
+//        }
 
         public String getClientName() {
             return clientName;
@@ -107,21 +144,21 @@ public class InlayProductDetail {
             this.delieverName = delieverName == null ? null : delieverName.trim();
         }
 
-        public String getDelieverTime() {
-            return delieverTime;
-        }
-
-        public void setDelieverTime(String delieverTime) {
-            this.delieverTime = delieverTime == null ? null : delieverTime.trim();
-        }
-
-        public String getAnalysisReportUrl(){
-        return analysisReportUrl;
+    public void setDelieverTime(Date delieverTime) {
+        this.delieverTime = delieverTime;
     }
-        public void setAnalysisReportUrl(String analysisReportUrl){
-            this.analysisReportUrl = analysisReportUrl == null ? null : analysisReportUrl.trim();
 
-        }
+    public Date getDelieverTime() {
+        return delieverTime;
+    }
+
+//    public String getAnalysisReportUrl(){
+//        return analysisReportUrl;
+//    }
+//        public void setAnalysisReportUrl(String analysisReportUrl){
+//            this.analysisReportUrl = analysisReportUrl == null ? null : analysisReportUrl.trim();
+//
+//        }
 
         public String getThumbnailUrl(){
         return thumbnailUrl;
