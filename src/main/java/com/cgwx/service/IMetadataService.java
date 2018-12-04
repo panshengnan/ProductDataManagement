@@ -32,4 +32,11 @@ public interface IMetadataService {
     List<String> getProduceAreaList();
     AdvanceProductSimpleInfoResult getAdvanceProductSimpleInfoListByConditions(AdvanceProductCri advanceProductCri);
     List<ThemeticProductListByGeos>  getThemeticProductListByConditions(String clientname,String description,Object geo, String producer, List<Industry> industryList);
+    List<String> selecSinglePeriodThemeticProductList(String productId);
+    List<ThemeticProductSimpleInfo> selectSimpleinfoById(String productId);
+    int selectProductTypeByProductId(String productId);
+    String selectProductTypeDescriptionByProductType(int  productType);
+    List<Industry> selectIndustryByProductid(String productId);
+    String selectProductAllfileDownloadurl( String var1);
+
 }

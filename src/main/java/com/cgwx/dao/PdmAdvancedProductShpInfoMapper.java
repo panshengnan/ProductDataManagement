@@ -15,7 +15,7 @@ public interface PdmAdvancedProductShpInfoMapper {
     @Select({"SELECT product_id,image_sourc,\n" +
             "        st_asgeojson(image_geometry) as geo,\n" +
             "        image_file,sensor,acquisitio, \n" +
-            "       num_channel,chan_type,islands\n" +
+            "       num_channel,chan_type,islands,\n" +
             "        cloud_cover, block_id \n"+
             "FROM   pdm_advanced_product_shp_info\n" +
             " WHERE   product_id = #{productId}"

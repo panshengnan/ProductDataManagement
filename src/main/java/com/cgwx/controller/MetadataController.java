@@ -49,7 +49,7 @@ public class MetadataController
     @ResponseBody
     public Result ThemeticProductDetail(@RequestParam(value = "productId", required = true) String productId) {
 
-        List<String> singlePeriodProductIdList=pdmThemeticProductDetailInfoMapper.selecSinglePeriodThemeticProductList(productId);
+        List<String> singlePeriodProductIdList=metadataService.selecSinglePeriodThemeticProductList(productId);
        // System.err.println(singlePeriodProductIdList);
         ThemeticProductDetail multiPeriodThemeticProductDetail = metadataService.getThemeticProductDetail(productId,singlePeriodProductIdList);
         return ResultUtil.success(multiPeriodThemeticProductDetail);
@@ -62,9 +62,9 @@ public class MetadataController
     @ResponseBody
     public Result advancedProductDetail(@RequestParam(value = "productId", required = true) String productId) {
 
-        int productType= pdmProductInfoMapper.selectProductTypeByProductId(productId);
+        int productType= metadataService.selectProductTypeByProductId(productId);
         System.out.print(productType);
-        String  advancedProductType = pdmProductTypeInfoMapper.selectProductTypeDescriptionByProductType(productType);
+        String  advancedProductType = metadataService.selectProductTypeDescriptionByProductType(productType);
         System.out.print(advancedProductType);
         //正射产品
         if(advancedProductType.equals("正射产品")) {
@@ -342,7 +342,7 @@ public class MetadataController
     {
         for(int i=0;i<themeticProductListByGeosResultList.size();i++)
         {
-            themeticProductListByGeosResultList.get(i).setUrl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(themeticProductListByGeosResultList.get(i).getProductId()));
+            themeticProductListByGeosResultList.get(i).setUrl(productStoreLinkHead+metadataService.selectProductAllfileDownloadurl(themeticProductListByGeosResultList.get(i).getProductId()));
         }
     }
     else {
@@ -448,9 +448,9 @@ public class MetadataController
         {
             for(int i=0;i<themeticProductListByGeosResultList.size();i++)
             {
-                themeticProductListByGeosResultList.get(i).setUrl(productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(themeticProductListByGeosResultList.get(i).getProductId()));
-                themeticProductListByGeosResultList.get(i).setThemeticProductSimpleInfoList(pdmThemeticProductDetailInfoMapper.selectSimpleinfoById(themeticProductListByGeosResultList.get(i).getProductId()));
-                themeticProductListByGeosResultList.get(i).setIndustryList(pdmThemeticProductDetailIndustryInfoMapper.selectIndustryByProductid(themeticProductListByGeosResultList.get(i).getProductId()));
+                themeticProductListByGeosResultList.get(i).setUrl(productStoreLinkHead+metadataService.selectProductAllfileDownloadurl(themeticProductListByGeosResultList.get(i).getProductId()));
+                themeticProductListByGeosResultList.get(i).setThemeticProductSimpleInfoList(metadataService.selectSimpleinfoById(themeticProductListByGeosResultList.get(i).getProductId()));
+                themeticProductListByGeosResultList.get(i).setIndustryList(metadataService.selectIndustryByProductid(themeticProductListByGeosResultList.get(i).getProductId()));
             }
         }
         else {
@@ -808,7 +808,7 @@ public class MetadataController
     @ResponseBody
     public Result getAllFielDownloadurl( @RequestParam(value = "productId", required = true) String productId) {
         //System.out.println(iProductArchiveService.getProducerList(""));
-       String url=productStoreLinkHead+pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(productId);
+       String url=productStoreLinkHead+metadataService.selectProductAllfileDownloadurl(productId);
        return ResultUtil.success(url);
     }
 }

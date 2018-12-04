@@ -905,5 +905,43 @@ public class MetadataServiceImpl implements IMetadataService {
         List<String> produceAreaList=pdmProductInfoMapper.getProduceAreaList();
         return  produceAreaList;
     }
+    @Override
+    public    List<String> selecSinglePeriodThemeticProductList(String productId)
+    {
+        List<String> singlePeriodProductIdList=pdmThemeticProductDetailInfoMapper.selecSinglePeriodThemeticProductList(productId);
+        return singlePeriodProductIdList;
+    }
+    @Override
+    public   List<ThemeticProductSimpleInfo> selectSimpleinfoById(String productId)
+    {
+        List<ThemeticProductSimpleInfo> themeticProductSimpleInfoList=pdmThemeticProductDetailInfoMapper.selectSimpleinfoById(productId);
+        return themeticProductSimpleInfoList;
+    }
+    @Override
+    public int selectProductTypeByProductId(String productId)
+    {
+        int productType= pdmProductInfoMapper.selectProductTypeByProductId(productId);
+        return productType;
+    }
+    @Override
+    public String selectProductTypeDescriptionByProductType(int  productType)
+    {
+        String  advancedProductType = pdmProductTypeInfoMapper.selectProductTypeDescriptionByProductType(productType);
+        return advancedProductType;
+    }
+
+    @Override
+    public List<Industry> selectIndustryByProductid(String productId)
+    {
+        List<Industry> industryList=pdmThemeticProductDetailIndustryInfoMapper.selectIndustryByProductid(productId);
+        return industryList;
+    }
+    @Override
+    public String selectProductAllfileDownloadurl( String var1)
+    {
+        String url=pdmProductStoreLinkInfoMapper.selectProductAllfileDownloadurl(var1);
+        return url;
+    }
+
 }
 
