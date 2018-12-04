@@ -90,10 +90,10 @@ public class IProductDownloadServiceImpl implements IProductDownloadService {
     }
 
     @Override /*根据产品id获取产品完整父路径*/
-    public String getEntityFilePath(String productId){
+    public String getEntityFilePath(String productId) {
 
         String path = "";
-        String productType = productId.substring(0,3);
+        String productType = productId.substring(0, 3);
         switch (productType) {
             case "THE":
                 path = pdmThemeticProductInfoMapper.selectFilePathByProductId(productId);
@@ -126,7 +126,7 @@ public class IProductDownloadServiceImpl implements IProductDownloadService {
     }
 
     @Override/*高级产品heihei*/
-    public int generateProductLink(int productType,String productId,String productName){
+    public int generateProductLink(int productType, String productId, String productName) {
 
         String productPathVar = "";
         switch (productType) {
@@ -149,26 +149,24 @@ public class IProductDownloadServiceImpl implements IProductDownloadService {
 
         String path = getEntityFilePath(productId);
         SecondaryFileStructure secondaryFileStructure = iProductArchiveService.getSecondaryFileStructure(path);
-        List<DirectoryInfo> directoryInfoList =secondaryFileStructure.getDirectory();
+        List<DirectoryInfo> directoryInfoList = secondaryFileStructure.getDirectory();
         List<String> files = secondaryFileStructure.getFile();
-        for(String file : files)
-        {
+        for (String file : files) {
             PdmProductStoreLinkInfo pdmProductStoreLinkInfo = new PdmProductStoreLinkInfo();
             pdmProductStoreLinkInfo.setProductId(productId);
             pdmProductStoreLinkInfo.setSinglePeriodProductId("");
             pdmProductStoreLinkInfo.setFileName(file);
-            pdmProductStoreLinkInfo.setStoreLink(productPathVar+productName+'/'+file);
+            pdmProductStoreLinkInfo.setStoreLink(productPathVar + productName + '/' + file);
             pdmProductStoreLinkInfoMapper.insert(pdmProductStoreLinkInfo);
         }
-        for(DirectoryInfo directoryInfo : directoryInfoList)
-        {
+        for (DirectoryInfo directoryInfo : directoryInfoList) {
             List<String> fileList = directoryInfo.getFileListInDirectory();
-            for(String fileName : fileList) {
+            for (String fileName : fileList) {
                 PdmProductStoreLinkInfo pdmProductStoreLinkInfo = new PdmProductStoreLinkInfo();
                 pdmProductStoreLinkInfo.setProductId(productId);
                 pdmProductStoreLinkInfo.setSinglePeriodProductId(directoryInfo.getSingleTempId());
                 pdmProductStoreLinkInfo.setFileName(fileName);
-                pdmProductStoreLinkInfo.setStoreLink(productPathVar+productName+'/'+directoryInfo.getDirectoryName()+'/'+fileName);
+                pdmProductStoreLinkInfo.setStoreLink(productPathVar + productName + '/' + directoryInfo.getDirectoryName() + '/' + fileName);
                 pdmProductStoreLinkInfoMapper.insert(pdmProductStoreLinkInfo);
             }
         }

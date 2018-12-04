@@ -1,6 +1,5 @@
 package com.cgwx.service.impl;
 
-
 import com.cgwx.aop.result.Result;
 import com.cgwx.aop.result.ResultUtil;
 import com.cgwx.common.constants.LayerInfo;
@@ -12,8 +11,6 @@ import com.cgwx.data.dto.PolygonObject;
 import com.cgwx.data.entity.PdmProductLayerInfo;
 import com.cgwx.service.LayerPublishService;
 import com.google.gson.Gson;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
 import net.sf.json.JSONObject;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -26,13 +23,12 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
 
-import org.geotools.data.shapefile.ShapefileDataStore;////
+import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
-//import org.geotools.geojson.geom.GeometryJSON;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -48,24 +44,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.opengis.filter.Filter;
 
-import static net.sf.json.JSONObject.*;
-
-
 @Service
-public class LayerPublishServiceImpl implements LayerPublishService
-{
+public class LayerPublishServiceImpl implements LayerPublishService {
     @Autowired
     LayerInfo layerInfo;
 
@@ -77,52 +67,46 @@ public class LayerPublishServiceImpl implements LayerPublishService
 
     @Override
     public Result publishTifToGeoserver(JSONObject jsonObject) throws ParserConfigurationException, IOException {
-//        String fileName = jsonObject.get("filename").toString();
-        JSONObject resultObject=new JSONObject();
-        HttpClient httpClient=new HttpClient();
-        UsernamePasswordCredentials creds = new UsernamePasswordCredentials(layerInfo.getGeoserverUsername() ,layerInfo.getGeoserverPassword());
+
+        JSONObject resultObject = new JSONObject();
+        HttpClient httpClient = new HttpClient();
+        UsernamePasswordCredentials creds = new UsernamePasswordCredentials(layerInfo.getGeoserverUsername(), layerInfo.getGeoserverPassword());
         System.out.println(layerInfo.getGeoserverUsername());
         httpClient.getState().setCredentials(AuthScope.ANY, creds);
         httpClient.getParams().setContentCharset("UTF-8");
-        String url=layerInfo.getGeoserverPath()+"/rest/workspaces/"+jsonObject.getString("namespace")+"/coveragestores";
-        String data= GeoserverXml.GetCoveragestoreXml(jsonObject);
-        PostMethod postMethod=new PostMethod(url);
-        RequestEntity requestEntity=new StringRequestEntity(data,"application/xml","UTF-8");
+        String url = layerInfo.getGeoserverPath() + "/rest/workspaces/" + jsonObject.getString("namespace") + "/coveragestores";
+        String data = GeoserverXml.GetCoveragestoreXml(jsonObject);
+        PostMethod postMethod = new PostMethod(url);
+        RequestEntity requestEntity = new StringRequestEntity(data, "application/xml", "UTF-8");
         postMethod.setRequestEntity(requestEntity);
-        int result=httpClient.executeMethod(postMethod);
-        if(result!=201)
-        {
-
-            if(result==500)
-            {
+        int result = httpClient.executeMethod(postMethod);
+        if (result != 201) {
+            if (result == 500) {
                 System.out.println("存在同名图层");
-                return ResultUtil.error(511,"存在同名图层");
+                return ResultUtil.error(511, "存在同名图层");
 
-            }
-            else
-            {
+            } else {
                 System.out.println(postMethod.getResponseBodyAsString());
                 System.out.println(result);
                 System.out.println("发布存储失败");
-                return  ResultUtil.error(511,"发布存储失败");}
+                return ResultUtil.error(511, "发布存储失败");
+            }
         }
-        data= GeoserverXml.getCoverageXml(jsonObject);
-        url=layerInfo.getGeoserverPath()+"/rest/workspaces/"+jsonObject.getString("namespace")+"/coveragestores/"+ URLEncoder.encode(jsonObject.getString("storename"),"utf-8")+"/coverages";
-        postMethod=new PostMethod(url);
-        postMethod.setRequestHeader("Content-type","text/xml");
-        requestEntity=new StringRequestEntity(data,"application/xml","UTF-8");
+        data = GeoserverXml.getCoverageXml(jsonObject);
+        url = layerInfo.getGeoserverPath() + "/rest/workspaces/" + jsonObject.getString("namespace") + "/coveragestores/" + URLEncoder.encode(jsonObject.getString("storename"), "utf-8") + "/coverages";
+        postMethod = new PostMethod(url);
+        postMethod.setRequestHeader("Content-type", "text/xml");
+        requestEntity = new StringRequestEntity(data, "application/xml", "UTF-8");
         postMethod.setRequestEntity(requestEntity);
         result = httpClient.executeMethod(postMethod);
-        if(result!=201)
-        {
-
-            url=layerInfo.getGeoserverPath()+"/rest/workspaces/"+jsonObject.getString("namespace")+"/coveragestores/"+URLEncoder.encode(jsonObject.getString("storename"),"utf-8");
-            DeleteMethod deleteMethod=new DeleteMethod(url);
+        if (result != 201) {
+            url = layerInfo.getGeoserverPath() + "/rest/workspaces/" + jsonObject.getString("namespace") + "/coveragestores/" + URLEncoder.encode(jsonObject.getString("storename"), "utf-8");
+            DeleteMethod deleteMethod = new DeleteMethod(url);
             httpClient.executeMethod(deleteMethod);
-            return ResultUtil.error(512,postMethod.getResponseBodyAsString());
+            return ResultUtil.error(512, postMethod.getResponseBodyAsString());
         }
 
-      return ResultUtil.success();
+        return ResultUtil.success();
     }
 
     @Override
@@ -131,18 +115,18 @@ public class LayerPublishServiceImpl implements LayerPublishService
         File file = new File(filePath);
         String name = file.getName().split("\\.")[0];
         jsonObject.put("filename", name);
-        if(name.length()>20)name=name.substring(0,20);
+        if (name.length() > 20) name = name.substring(0, 20);
         GeoTiffReader reader;
         GeoTiffFormat format = new GeoTiffFormat();
         File file2 = new File(filePath);
         reader = format.getReader(file2.toURL());
         if (reader == null) {
-//            return ResultUtil.error(510, "Tif文件无法打开").toString();//注意一下
+            System.out.println("Tif文件无法打开");
         }
         GridCoverage2D coverage = reader.read(null);
         String crs = coverage.getCoordinateReferenceSystem().toString();
         if (crs == null) {
-//            return ResultUtil.error(510, "文件缺少坐标系").toString();//注意一下
+            System.out.println("文件缺少坐标系");
         }
         Envelope envelope = coverage.getEnvelope();
         AffineTransform art = (AffineTransform) coverage.getGridGeometry().getGridToCRS();
@@ -155,11 +139,10 @@ public class LayerPublishServiceImpl implements LayerPublishService
         com.vividsolutions.jts.geom.Envelope envelope1 = new com.vividsolutions.jts.geom.Envelope(envelope.getMinimum(0), envelope.getMaximum(0), envelope.getMinimum(1), envelope.getMaximum(1));
         if (!PublishLayer.GetCrsEPSG(crs).equals("4326")) envelope1 = JTS.transform(envelope1, transform);
         jsonObject.put("latLonBoundingBox", "[" + envelope1.getMinX() + "," + envelope1.getMaxX() + "," + envelope1.getMinY() + "," + envelope1.getMaxY() + "]");
-//        System.out.println("真的范围是："+jsonObject.get("latLonBoundingBox"));
-        com.vividsolutions.jts.geom.Polygon polygon = JTS.toGeometry(envelope1);
-        System.out.println("Polygon是："+polygon);
-// ！！！！！！！！！！！！！！！！！！！！！！！！！！       GeometryJSON g = new GeometryJSON();
 
+        com.vividsolutions.jts.geom.Polygon polygon = JTS.toGeometry(envelope1);
+        System.out.println("Polygon是：" + polygon);
+        // ！！GeometryJSON g = new GeometryJSON();
         jsonObject.put("nativeCRS", crs);
         jsonObject.put("filepath", filePath);
         jsonObject.put("rasterXSize", coverage.getRenderedImage().getWidth());
@@ -174,54 +157,52 @@ public class LayerPublishServiceImpl implements LayerPublishService
         jsonObject.put("borderColor", borderColor);
         jsonObject.put("data_type", "image");
         jsonObject.put("geoserverPath", layerInfo.getGeoserverPath());
-        //注意一下
+
         JSONObject jsonObjectReturn = new JSONObject();
         String geoJsonReturn = transformPOLYGONToPolygon(getGj(polygon.toString()));
-        System.out.println("Polygon2是："+geoJsonReturn);
-        jsonObjectReturn.put("fileName",name);
-        jsonObjectReturn.put("geoJson",geoJsonReturn);
-        //注意一下
-        try {
-            Result result= publishTifToGeoserver(jsonObject);
-            if(result.getStatus()==200)
-            {
-                JSONObject param=new JSONObject();
+        System.out.println("Polygon2是：" + geoJsonReturn);
+        jsonObjectReturn.put("fileName", name);
+        jsonObjectReturn.put("geoJson", geoJsonReturn);
 
-                param.put("layerName",nameSpace+":"+name);
-                if(coverage.getCoordinateReferenceSystem().toString().contains("UTM"))param.put("projection","UTM");
-                else param.put("projection","WGS-84");
+        try {
+            Result result = publishTifToGeoserver(jsonObject);
+            if (result.getStatus() == 200) {
+                JSONObject param = new JSONObject();
+
+                param.put("layerName", nameSpace + ":" + name);
+                if (coverage.getCoordinateReferenceSystem().toString().contains("UTM")) param.put("projection", "UTM");
+                else param.put("projection", "WGS-84");
                 return jsonObjectReturn;
-//                return   ResultUtil.success(param.toString()).toString();
+
             }
-//            return result.toString();
+
             return jsonObjectReturn;
 
         } catch (ParserConfigurationException e) {
             System.out.println("发布失败");
-            return  jsonObjectReturn;
-//            return ResultUtil.error(511,"发布失败").toString();
+            return jsonObjectReturn;
         }
 
     }
 
     @Override
-    public SimpleFeatureCollection readShp(String path ){
+    public SimpleFeatureCollection readShp(String path) {
         return readShp(path, null);
 
     }
 
-     SimpleFeatureCollection  readShp(String path ,Filter filter){
+    SimpleFeatureCollection readShp(String path, Filter filter) {
         SimpleFeatureSource featureSource = readStoreByShp(path);
-        if(featureSource == null) return null;
+        if (featureSource == null) return null;
         try {
-            return filter != null ? featureSource.getFeatures(filter) : featureSource.getFeatures() ;
+            return filter != null ? featureSource.getFeatures(filter) : featureSource.getFeatures();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null ;
+        return null;
     }
 
-     SimpleFeatureSource readStoreByShp(String path ){
+    SimpleFeatureSource readStoreByShp(String path) {
         File file = new File(path);
         FileDataStore store;
         SimpleFeatureSource featureSource = null;
@@ -233,7 +214,7 @@ public class LayerPublishServiceImpl implements LayerPublishService
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return featureSource ;
+        return featureSource;
     }
 
 
@@ -256,9 +237,9 @@ public class LayerPublishServiceImpl implements LayerPublishService
                 for (int j = 0; j < items.length; j++) {
                     String jItem = items[j].trim();
                     String[] jItems = jItem.split(" ");
-                    Double[] listResult = new Double[] {
+                    Double[] listResult = new Double[]{
                             Double.parseDouble(jItems[0]),
-                            Double.parseDouble(jItems[1]) };
+                            Double.parseDouble(jItems[1])};
                     list.add(listResult);
                 }
                 lists.add(list);
@@ -272,9 +253,9 @@ public class LayerPublishServiceImpl implements LayerPublishService
                 for (int j = 1; j < items.length; j++) {
                     String jItem = items[j].trim();
                     String[] jItems = jItem.split(" ");
-                    Double[] listResult = new Double[] {
+                    Double[] listResult = new Double[]{
                             Double.parseDouble(jItems[0]),
-                            Double.parseDouble(jItems[1]) };
+                            Double.parseDouble(jItems[1])};
                     list.add(listResult);
                 }
                 lists.add(list);
@@ -298,8 +279,6 @@ public class LayerPublishServiceImpl implements LayerPublishService
             String type = wkt.substring(0, index);
             String value = wkt.substring(index);
             String t = value.replace("(", "[").replace(")", "]");
-//        Pattern.compile("-?(0-9){1,3}(.0-9)*+\\s+-?(0-9){1,2}(.0-9)*+");
-//      Pattern compile = Pattern.compile("[-.0-9]+\\s+[-.0-9]+\\s+[-.0-9]+");
             Pattern compile = Pattern.compile("[-.0-9]+\\s+[-.0-9]+");
             Matcher matcher = compile.matcher(t);
             StringBuilder sb = new StringBuilder();
@@ -322,67 +301,62 @@ public class LayerPublishServiceImpl implements LayerPublishService
     }
 
     @Override
-    public String transformMultiPolygonToPolygon(JSONObject jsonObject){
+    public String transformMultiPolygonToPolygon(JSONObject jsonObject) {
 
         String coordinates = jsonObject.getString("coordinates");
-        coordinates = coordinates.substring(1,coordinates.length()-1);
-        jsonObject.put("coordinates",coordinates);
+        coordinates = coordinates.substring(1, coordinates.length() - 1);
+        jsonObject.put("coordinates", coordinates);
         String geojson = jsonObject.toString();
-        geojson = geojson.replace("MULTIPOLYGON \"","Polygon\"");
+        geojson = geojson.replace("MULTIPOLYGON \"", "Polygon\"");
         return geojson;
     }
 
     @Override
-    public String transformPOLYGONToPolygon(JSONObject jsonObject){
+    public String transformPOLYGONToPolygon(JSONObject jsonObject) {
 
         String geojson = jsonObject.toString();
-        geojson = geojson.replace("POLYGON \"","Polygon\"");
+        geojson = geojson.replace("POLYGON \"", "Polygon\"");
         return geojson;
 
     }
 
     @Override
-    public List<JSONObject> getAdvancedProductShpInfo(String path){
+    public List<JSONObject> getAdvancedProductShpInfo(String path) {
 
 
-        //读取shp
         SimpleFeatureCollection colls1 = this.readShp(path);
-        //拿到所有features
+
         SimpleFeatureIterator iters = colls1.features();
-        //遍历打印
+
         List<JSONObject> jSONObjects = new ArrayList<JSONObject>();
         while (iters.hasNext()) {
             SimpleFeature sf = iters.next();
-//            System.out.println(sf.getID() + " , " + sf.getAttributes());
-//            System.out.println(sf.getAttribute("ImageFile"));
-//            System.out.println(sf.getFeatureType());
-//            System.out.println(sf.getProperties());
-//            System.out.println("名字是"+sf.getName());
+
             String[] strList = (sf.getProperties()).toString().split("SimpleFeatureImpl.Attribute");
-//            System.out.println("分割结果：");
+
             JSONObject jsonObject = new JSONObject();
             for (int i = 0; i < strList.length; i++) {
                 String tmp = strList[i];
-                System.out.println("原串是："+tmp);
+                System.out.println("原串是：" + tmp);
                 String key = "";
                 String value = "";
                 if (i > 0 && i < strList.length - 1) {
                     key = tmp.substring(2, tmp.indexOf('<'));
-//                    System.out.println("key是：" + key);
+
                     String comma = ",";
 
                     if (comma.equals((tmp.charAt(tmp.length() - 1))))
                         value = "";
                     else
                         value = tmp.substring(tmp.lastIndexOf('=') + 1, tmp.lastIndexOf(','));
-//                    System.out.println("value是：" + value);
+
                 }
                 if (i == strList.length - 1) {
                     {
                         key = tmp.substring(2, tmp.indexOf('<'));
-//                        System.out.println("key是：" + key);
+
                         value = tmp.substring(tmp.lastIndexOf('=') + 1, tmp.lastIndexOf(']'));
-//                        System.out.println("value是：" + value);
+
                     }
                 }
                 if (i != 0)
@@ -392,29 +366,27 @@ public class LayerPublishServiceImpl implements LayerPublishService
 
         }
         List<JSONObject> jSONObjectList = new ArrayList<JSONObject>();
-        for(JSONObject jsonObjectTmp : jSONObjects){
+        for (JSONObject jsonObjectTmp : jSONObjects) {
 
             String wkt = jsonObjectTmp.getString("the_geom");
-            System.out.println("wkt为："+wkt);
+            System.out.println("wkt为：" + wkt);
             String multiPolygon = getGj(wkt).toString();
-            System.out.println("multiPlygon是："+multiPolygon);
+            System.out.println("multiPlygon是：" + multiPolygon);
             String geojson = transformMultiPolygonToPolygon(getGj(wkt));
-            System.out.println("geojson:"+geojson);
+            System.out.println("geojson:" + geojson);
             System.out.println(jsonObjectTmp.getString("the_geom"));
-//            JSONObject geoJsonOB = JSONObject.fromObject(jsonObjectTmp.getString("the_geom"));
-//            geoJsonOB.put("type","Polygon");
-//            geojson = geojson.replace("MULTIPOLYGON (","Polygon(");
-            jsonObjectTmp.put("the_geom",geojson);
+
+            jsonObjectTmp.put("the_geom", geojson);
             jSONObjectList.add(jsonObjectTmp);
         }
 
-        System.out.println("1111:"+jSONObjectList);
+        System.out.println("1111:" + jSONObjectList);
         return jSONObjectList;
 
     }
 
     @Override
-    public String getShpFilePath(String parentPath){
+    public String getShpFilePath(String parentPath) {
 
         String shpPath = "";
         File file = new File(parentPath);
@@ -422,9 +394,9 @@ public class LayerPublishServiceImpl implements LayerPublishService
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {
                 String tmp = tempList[i].toString();
-                String postfix = tmp.substring(tmp.lastIndexOf('.')+1);
-//                System.out.println(postfix);
-                if(postfix.equals("shp")&&tmp.contains("cutline"))
+                String postfix = tmp.substring(tmp.lastIndexOf('.') + 1);
+
+                if (postfix.equals("shp") && tmp.contains("cutline"))
                     shpPath = tmp;
             }
         }
@@ -432,7 +404,7 @@ public class LayerPublishServiceImpl implements LayerPublishService
     }
 
     @Override
-    public String getBoundaryShpFilePath(String parentPath){
+    public String getBoundaryShpFilePath(String parentPath) {
 
         String shpPath = "";
         File file = new File(parentPath);
@@ -440,9 +412,9 @@ public class LayerPublishServiceImpl implements LayerPublishService
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {
                 String tmp = tempList[i].toString();
-                String postfix = tmp.substring(tmp.lastIndexOf('.')+1);
-//                System.out.println(postfix);
-                if(postfix.equals("shp")&&tmp.contains("boundary"))
+                String postfix = tmp.substring(tmp.lastIndexOf('.') + 1);
+
+                if (postfix.equals("shp") && tmp.contains("boundary"))
                     shpPath = tmp;
             }
         }
@@ -450,7 +422,7 @@ public class LayerPublishServiceImpl implements LayerPublishService
     }
 
     @Override
-    public String getTifFilePath(String parentPath){
+    public String getTifFilePath(String parentPath) {
 
         String shpPath = "";
         File file = new File(parentPath);
@@ -458,8 +430,8 @@ public class LayerPublishServiceImpl implements LayerPublishService
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {
                 String tmp = tempList[i].toString();
-                String postfix = tmp.substring(tmp.lastIndexOf('.')+1);
-                if(postfix.equals("tif") || postfix.equals("TIF"))
+                String postfix = tmp.substring(tmp.lastIndexOf('.') + 1);
+                if (postfix.equals("tif") || postfix.equals("TIF"))
                     shpPath = tmp;
             }
         }
@@ -467,15 +439,15 @@ public class LayerPublishServiceImpl implements LayerPublishService
     }
 
     @Override
-    public int updateProductLayerInfo(PdmProductLayerInfo pdmProductLayerInfo){
+    public int updateProductLayerInfo(PdmProductLayerInfo pdmProductLayerInfo) {
 
-       return pdmProductLayerInfoMapper.insert(pdmProductLayerInfo);
+        return pdmProductLayerInfoMapper.insert(pdmProductLayerInfo);
     }
 
     @Override
-    public void updateThemeticProductDetailImgGeo(String productId,String singleId,String geoJson){
+    public void updateThemeticProductDetailImgGeo(String productId, String singleId, String geoJson) {
 
-        pdmThemeticProductDetailInfoMapper.updateThemeticProductDetailImgGeo(productId,singleId,geoJson);
+        pdmThemeticProductDetailInfoMapper.updateThemeticProductDetailImgGeo(productId, singleId, geoJson);
     }
 }
 

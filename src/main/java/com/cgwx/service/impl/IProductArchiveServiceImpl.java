@@ -1,7 +1,6 @@
 package com.cgwx.service.impl;
 
 import com.cgwx.dao.*;
-import com.cgwx.data.dto.ArchivalRecordsItems;
 import com.cgwx.data.dto.DirectoryInfo;
 import com.cgwx.data.dto.SecondaryFileStructure;
 import com.cgwx.data.dto.UploadFileReturn;
@@ -19,14 +18,9 @@ import net.lingala.zip4j.model.FileHeader;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.xmlbeans.impl.xb.xsdschema.Public;
-import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
 import org.json.XML;
-import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +37,6 @@ import javax.xml.transform.stream.StreamResult;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,6 +89,12 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     @Autowired
     PdmAdvancedProductShpInfoMapper pdmAdvancedProductShpInfoMapper;
 
+    @Autowired
+    PdmSatelliteInfoMapper pdmSatelliteInfoMapper;
+
+    @Autowired
+    PdmSensorInfoMapper pdmSensorInfoMapper;
+
     @Override/*上传文件*/
     public UploadFileReturn uploadFile(MultipartFile file) {
         if (file.isEmpty()) {
@@ -106,12 +105,12 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         String path = System.getProperty("user.dir") + "/临时存储区";
         File dest = new File(path + "/" + fileName);
         System.out.println("文件保存路径为：" + dest.toString());
-        if (!dest.getParentFile().exists()) { //判断文件父目录是否存在
+        if (!dest.getParentFile().exists()) {
             dest.getParentFile().mkdir();
         }
         try {
 
-            file.transferTo(dest); //保存文件
+            file.transferTo(dest);
             uploadFileReturn.setFileName(dest.toString());
             uploadFileReturn.setFilePath(path);
             return uploadFileReturn;
@@ -133,13 +132,12 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         try {
             File zipFile = new File(source);
             ZipFile zFile = new ZipFile(zipFile);
-//            zFile.setFileNameCharset("GBK32");
             zFile.setFileNameCharset("UTF-8");
-            File destDir = new File(dest);     // 解压目录
+            File destDir = new File(dest);
             if (zFile.isEncrypted()) {
-                zFile.setPassword(password.toCharArray());  // 设置密码
+                zFile.setPassword(password.toCharArray());
             }
-            zFile.extractAll(dest);      // 将文件抽出到解压目录(解压)
+            zFile.extractAll(dest);
             List<FileHeader> headerList = zFile.getFileHeaders();
             List<File> extractedFileList = new ArrayList<File>();
             for (FileHeader fileHeader : headerList) {
@@ -157,26 +155,22 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         }
 
         String unzipPath = source;
-        unzipPath = unzipPath.substring(0,unzipPath.indexOf('.'));
+        unzipPath = unzipPath.substring(0, unzipPath.indexOf('.'));
         return unzipPath;
     }
 
     @Override/*压缩zip文件*/
     public void zip(String srcFile, String dest, String passwd) {
         File srcfile = new File(srcFile);
-
-        //创建目标文件
         String destname = buildDestFileName(srcfile, dest);
         ZipParameters par = new ZipParameters();
         par.setCompressionMethod(Zip4jConstants.COMP_DEFLATE);
         par.setCompressionLevel(Zip4jConstants.DEFLATE_LEVEL_NORMAL);
-
         if (passwd != null) {
             par.setEncryptFiles(true);
             par.setEncryptionMethod(Zip4jConstants.ENC_METHOD_STANDARD);
             par.setPassword(passwd.toCharArray());
         }
-
         try {
             ZipFile zipfile = new ZipFile(destname);
             if (srcfile.isDirectory()) {
@@ -187,6 +181,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         } catch (ZipException e) {
         }
     }
+
     public static String buildDestFileName(File srcfile, String dest) {
         if (dest == null) {
             if (srcfile.isDirectory()) {
@@ -196,7 +191,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
                 dest = srcfile.getParent() + File.separator + filename + ".zip";
             }
         } else {
-            createPath(dest);//路径的创建
+            createPath(dest);
             if (dest.endsWith(File.separator)) {
                 String filename = "";
                 if (srcfile.isDirectory()) {
@@ -209,10 +204,11 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         }
         return dest;
     }
+
     public static void createPath(String dest) {
         File destDir = null;
         if (dest.endsWith(File.separator)) {
-            destDir = new File(dest);//给出的是路径时
+            destDir = new File(dest);
         } else {
             destDir = new File(dest.substring(0, dest.lastIndexOf(File.separator)));
         }
@@ -225,9 +221,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     @Override
     public void updateXml(Document document, PdmThemeticProductInfo pdmThemeticProductInfo) {
 
-        //取出这个元素
         Element element = document.createElement("productData");
-        //添加属性
         element.setAttribute("productId", "id1");
         Element element_name = document.createElement("name");
         element_name.setTextContent("2B");
@@ -238,20 +232,15 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         element.appendChild(element_name);
 //         element.appendChild(element_nianling);
 //         element.appendChild(element_jieshao);
-        //添加这个元素
         document.getDocumentElement().appendChild(element);
     }
 
     @Override/*更新xml*/
     public void update(Document document, String fileName) {
         try {
-            //创建一个TransformerFactory实例
+
             TransformerFactory tff = TransformerFactory.newInstance();
-            //通过TransformerFactory 得到一个转换器
             Transformer tf = tff.newTransformer();
-            //通过Transformer类的方法 transform(Source xmlSource, Result outputTarget)
-            //将 XML Source 转换为 Result。
-//            tf.transform(new DOMSource(document), new StreamResult("C:\\Users\\37753\\Desktop\\产品管理后台\\pdm\\专题产品\\长春市201309热岛效应\\长春热岛201607.xml"));
             tf.transform(new DOMSource(document), new StreamResult(fileName));
             System.out.println("写入完成！");
         } catch (Exception e) {
@@ -344,7 +333,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     @Override /*获取一个文件夹中的所有文件*/
-    public List<String> getFileNameList(String productId){
+    public List<String> getFileNameList(String productId) {
 
         String path = iProductDownloadService.getEntityFilePath(productId);
         List<String> files = new ArrayList<String>();
@@ -353,21 +342,19 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
 
         for (int i = 0; i < tempList.length; i++) {
             if (tempList[i].isFile()) {
-              //System.out.println("文     件：" + tempList[i]);
-              String tmp = tempList[i].toString();
-              tmp = tmp.substring(tmp.lastIndexOf('\\')+1);
-              System.out.println(tmp);
-              files.add(tmp);
+                String tmp = tempList[i].toString();
+                tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
+                System.out.println(tmp);
+                files.add(tmp);
             }
             if (tempList[i].isDirectory()) {
-             //System.out.println("文件夹：" + tempList[i]);
             }
         }
         return files;
     }
 
     @Override/*获取专题多期产品中二级目录中的目录结构，并且写入归档缓存表以及归档记录*/
-    public SecondaryFileStructure getSecondaryFileStructureAndWriteCheckTable(String path,String archivePersonnel,int type) {
+    public SecondaryFileStructure getSecondaryFileStructureAndWriteCheckTable(String path, String archivePersonnel, int type) {
 
         List<String> files = new ArrayList<String>();
         File file = new File(path);
@@ -377,78 +364,74 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         secondaryFileStructure.setTempId(tempId);
         List<DirectoryInfo> directoryInfoList = new ArrayList<DirectoryInfo>();
         int count = 0;
-        if(tempList!=null)
-        for (int i = 0; i < tempList.length; i++) {
-            if (tempList[i].isFile()) {
-                String tmp = tempList[i].toString();
-                tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
-                System.out.println(tmp);
-                files.add(tmp);
-            }
-            if (tempList[i].isDirectory()) {
-                DirectoryInfo directoryInfo = new DirectoryInfo();
-                directoryInfo.setSingleTempId((count++)+"");
-                List<String> files2 = new ArrayList<String>();
-                String tmp = tempList[i].toString();
-                tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
-                directoryInfo.setDirectoryName(tmp);
-                System.out.println(tmp);
-                File[] tempList2 = tempList[i].listFiles();
-                for (int j = 0; j < tempList2.length; j++) {
-                    String tmp2 = tempList2[j].toString();
-                    tmp2 = tmp2.substring(tmp2.lastIndexOf('\\') + 1);
-                    System.out.println(tmp2);
-                    files2.add(tmp2);
-
+        if (tempList != null)
+            for (int i = 0; i < tempList.length; i++) {
+                if (tempList[i].isFile()) {
+                    String tmp = tempList[i].toString();
+                    tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
+                    System.out.println(tmp);
+                    files.add(tmp);
                 }
-                directoryInfo.setFileListInDirectory(files2);
-                directoryInfoList.add(directoryInfo);
+                if (tempList[i].isDirectory()) {
+                    DirectoryInfo directoryInfo = new DirectoryInfo();
+                    directoryInfo.setSingleTempId((count++) + "");
+                    List<String> files2 = new ArrayList<String>();
+                    String tmp = tempList[i].toString();
+                    tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
+                    directoryInfo.setDirectoryName(tmp);
+                    System.out.println(tmp);
+                    File[] tempList2 = tempList[i].listFiles();
+                    for (int j = 0; j < tempList2.length; j++) {
+                        String tmp2 = tempList2[j].toString();
+                        tmp2 = tmp2.substring(tmp2.lastIndexOf('\\') + 1);
+                        System.out.println(tmp2);
+                        files2.add(tmp2);
+
+                    }
+                    directoryInfo.setFileListInDirectory(files2);
+                    directoryInfoList.add(directoryInfo);
+                }
             }
-        }
         secondaryFileStructure.setFile(files);
         secondaryFileStructure.setDirectory(directoryInfoList);
         PdmArchiveCheckInfo pdmArchiveCheckInfo = new PdmArchiveCheckInfo();
         pdmArchiveCheckInfo.setTemporaryPath(path);
         pdmArchiveCheckInfo.setProductId(tempId);
-        pdmArchiveCheckInfo.setFileName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveCheckInfo.setFileName(path.substring(path.lastIndexOf('\\') + 1));
         pdmArchiveCheckInfo.setStatus(0);
         pdmArchiveCheckInfoMapper.insert(pdmArchiveCheckInfo);
-        //操作一波归档记录表
         PdmArchiveRecordsInfo pdmArchiveRecordsInfo = new PdmArchiveRecordsInfo();
         pdmArchiveRecordsInfo.setArchiveResult(0);
         pdmArchiveRecordsInfo.setArchivePersonnel(archivePersonnel);
-        pdmArchiveRecordsInfo.setProductName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveRecordsInfo.setProductName(path.substring(path.lastIndexOf('\\') + 1));
         pdmArchiveRecordsInfo.setArchiveType(type);
         pdmArchiveRecordsInfo.setProductId(tempId);
         pdmArchiveRecordsInfo.setArchiveTime(new Date());
         pdmArchiveRecordsInfoMapper.insert(pdmArchiveRecordsInfo);
-        System.out.println("路径是："+path.substring(path.lastIndexOf('\\')+1));
-        //操作一波归档记录表
+        System.out.println("路径是：" + path.substring(path.lastIndexOf('\\') + 1));
         return secondaryFileStructure;
     }
 
 
     @Override
-    public String writeArchiveRecordAndWriteArchiveCheckInfo(String path,String archivePersonnel,int type){
+    public String writeArchiveRecordAndWriteArchiveCheckInfo(String path, String archivePersonnel, int type) {
 
         String tempId = getUUId();
         PdmArchiveCheckInfo pdmArchiveCheckInfo = new PdmArchiveCheckInfo();
         pdmArchiveCheckInfo.setTemporaryPath(path);
         pdmArchiveCheckInfo.setProductId(tempId);
-        pdmArchiveCheckInfo.setFileName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveCheckInfo.setFileName(path.substring(path.lastIndexOf('\\') + 1));
         pdmArchiveCheckInfo.setStatus(0);
         pdmArchiveCheckInfoMapper.insert(pdmArchiveCheckInfo);
-        //操作一波归档记录表
         PdmArchiveRecordsInfo pdmArchiveRecordsInfo = new PdmArchiveRecordsInfo();
         pdmArchiveRecordsInfo.setArchiveResult(0);
         pdmArchiveRecordsInfo.setArchivePersonnel(archivePersonnel);
-        pdmArchiveRecordsInfo.setProductName(path.substring(path.lastIndexOf('\\')+1));
+        pdmArchiveRecordsInfo.setProductName(path.substring(path.lastIndexOf('\\') + 1));
         pdmArchiveRecordsInfo.setArchiveType(type);
         pdmArchiveRecordsInfo.setProductId(tempId);
         pdmArchiveRecordsInfo.setArchiveTime(new Date());
         pdmArchiveRecordsInfoMapper.insert(pdmArchiveRecordsInfo);
-        System.out.println("路径是："+path.substring(path.lastIndexOf('\\')+1));
-        //操作一波归档记录表
+        System.out.println("路径是：" + path.substring(path.lastIndexOf('\\') + 1));
         return tempId;
     }
 
@@ -472,7 +455,7 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
             }
             if (tempList[i].isDirectory()) {
                 DirectoryInfo directoryInfo = new DirectoryInfo();
-                directoryInfo.setSingleTempId((count++)+"");
+                directoryInfo.setSingleTempId((count++) + "");
                 List<String> files2 = new ArrayList<String>();
                 String tmp = tempList[i].toString();
                 tmp = tmp.substring(tmp.lastIndexOf('\\') + 1);
@@ -497,25 +480,23 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     /* 复制文件内容 */
-    public void copyFile(String oldPath, String newPath){
+    public void copyFile(String oldPath, String newPath) {
         try {
             int bytesum = 0;
             int byteread = 0;
             File oldfile = new File(oldPath);
-            if (oldfile.exists()) { //文件存在时
+            if (oldfile.exists()) {
                 InputStream inStream = new FileInputStream(oldPath); //读入原文件
                 FileOutputStream fs = new FileOutputStream(newPath);
                 byte[] buffer = new byte[1444];
                 int length;
-                while ( (byteread = inStream.read(buffer)) != -1) {
-                    bytesum += byteread; //字节数 文件大小
-                   // System.out.println(bytesum);
+                while ((byteread = inStream.read(buffer)) != -1) {
+                    bytesum += byteread;
                     fs.write(buffer, 0, byteread);
                 }
                 inStream.close();
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("复制单个文件操作出错");
             e.printStackTrace();
 
@@ -535,36 +516,34 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     public void copyFolder(String oldPath, String newPath) {
 
         try {
-            (new File(newPath)).mkdirs(); //如果文件夹不存在 则建立新文件夹
-            File a=new File(oldPath);
-            String[] file=a.list();
-            File temp=null;
+            (new File(newPath)).mkdirs();
+            File a = new File(oldPath);
+            String[] file = a.list();
+            File temp = null;
             for (int i = 0; i < file.length; i++) {
-                if(oldPath.endsWith(File.separator)){
-                    temp=new File(oldPath+file[i]);
+                if (oldPath.endsWith(File.separator)) {
+                    temp = new File(oldPath + file[i]);
+                } else {
+                    temp = new File(oldPath + File.separator + file[i]);
                 }
-                else{
-                    temp=new File(oldPath+File.separator+file[i]);
-                }
-                if(temp.isFile()){
+                if (temp.isFile()) {
                     FileInputStream input = new FileInputStream(temp);
                     FileOutputStream output = new FileOutputStream(newPath + "/" +
                             (temp.getName()).toString());
                     byte[] b = new byte[1024 * 5];
                     int len;
-                    while ( (len = input.read(b)) != -1) {
+                    while ((len = input.read(b)) != -1) {
                         output.write(b, 0, len);
                     }
                     output.flush();
                     output.close();
                     input.close();
                 }
-                if(temp.isDirectory()){//如果是子文件夹
-                    copyFolder(oldPath+"/"+file[i],newPath+"/"+file[i]);
+                if (temp.isDirectory()) {
+                    copyFolder(oldPath + "/" + file[i], newPath + "/" + file[i]);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("复制整个文件夹内容操作出错");
             e.printStackTrace();
 
@@ -573,60 +552,60 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     @Override/**/
-    public List<String> getClientNameList(String clientName){
+    public List<String> getClientNameList(String clientName) {
 
         return pdmProductInfoMapper.selectClientNameList(clientName);
     }
 
     @Override/**/
-    public List<String> getDeliverNameList(String deliverName){
+    public List<String> getDeliverNameList(String deliverName) {
 
         return pdmProductInfoMapper.selectDeliverNameList(deliverName);
     }
 
     @Override/**/
-    public List<String> getProducerList(String producer){
+    public List<String> getProducerList(String producer) {
 
         return pdmProducerInfoMapper.selectProducerList(producer);
     }
 
     @Override/**/
-    public int updateProductInfo(PdmProductInfo pdmProductInfo){
-       return pdmProductInfoMapper.insert(pdmProductInfo);
+    public int updateProductInfo(PdmProductInfo pdmProductInfo) {
+        return pdmProductInfoMapper.insert(pdmProductInfo);
     }
 
     @Override/**/
-    public String getProductName(String tempId){
+    public String getProductName(String tempId) {
 
         return pdmArchiveCheckInfoMapper.selectFileNameById(tempId);
     }
 
     @Override/**/
-    public String getThemeticProductTemporaryPath(String tempId){
+    public String getThemeticProductTemporaryPath(String tempId) {
 
         return pdmArchiveCheckInfoMapper.selectTemporaryPathById(tempId);
     }
 
     @Override/**/
-    public int updateThemeticProductDetailIndustry(PdmThemeticProductDetailIndustryInfo pdmThemeticProductDetailIndustryInfo){
+    public int updateThemeticProductDetailIndustry(PdmThemeticProductDetailIndustryInfo pdmThemeticProductDetailIndustryInfo) {
 
         return pdmThemeticProductDetailIndustryInfoMapper.insert(pdmThemeticProductDetailIndustryInfo);
     }
 
     @Override/**/
-    public int updateThemeticProductDetail(PdmThemeticProductDetailInfo pdmThemeticProductDetailInfo){
+    public int updateThemeticProductDetail(PdmThemeticProductDetailInfo pdmThemeticProductDetailInfo) {
 
         return pdmThemeticProductDetailInfoMapper.insert(pdmThemeticProductDetailInfo);
     }
 
     @Override/**/
-    public int updateThemeticProduct(PdmThemeticProductInfo pdmThemeticProductInfo){
+    public int updateThemeticProduct(PdmThemeticProductInfo pdmThemeticProductInfo) {
 
         return pdmThemeticProductInfoMapper.insert(pdmThemeticProductInfo);
     }
 
     @Override
-    public int insertPdmProducerInfo(String producerName){
+    public int insertPdmProducerInfo(String producerName) {
 
         PdmProducerInfo pdmProducerInfo = new PdmProducerInfo();
         pdmProducerInfo.setProducer(producerName);
@@ -634,13 +613,13 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     @Override
-    public int selectCountByProducerName(String producerName){
+    public int selectCountByProducerName(String producerName) {
 
         return pdmProducerInfoMapper.selectCountByProducerName(producerName);
     }
 
     @Override
-    public int updatePdmProducerInfo(String producerName){
+    public int updatePdmProducerInfo(String producerName) {
 
         int count = selectCountByProducerName(producerName);
         if (count == 0) {
@@ -650,59 +629,68 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
     }
 
     @Override
-    public PageInfo<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel,int curPageNum, int maxResult,String productName,int archiveType,int archiveStatus){
+    public PageInfo<PdmArchiveRecordsInfo> getArchiveRecordList(String archivePersonnel, int curPageNum, int maxResult, String productName, int archiveType, int archiveStatus) {
 
         PageHelper.startPage(curPageNum, maxResult);
-        List<PdmArchiveRecordsInfo> pdmArchiveRecords = pdmArchiveRecordsInfoMapper.selectArchiveRecordsByArchivePersonnel(archivePersonnel,productName,archiveType,archiveStatus);
+        List<PdmArchiveRecordsInfo> pdmArchiveRecords = pdmArchiveRecordsInfoMapper.selectArchiveRecordsByArchivePersonnel(archivePersonnel, productName, archiveType, archiveStatus);
         PageInfo<PdmArchiveRecordsInfo> pageInfo = new PageInfo<>(pdmArchiveRecords);
-//        System.out.println("条目数为："+pageInfo.getList().size());
         return pageInfo;
     }
 
     @Override
-    public int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo,String tempId,int productType){
+    public int updateArchiveRecordsInfo(PdmArchiveRecordsInfo pdmArchiveRecordsInfo, String tempId, int productType) {
 
-        pdmArchiveRecordsInfoMapper.updateArchiveRecordsInfo(pdmArchiveRecordsInfo.getProductId(),pdmArchiveRecordsInfo.getArchiveResult(),tempId,productType);
+        pdmArchiveRecordsInfoMapper.updateArchiveRecordsInfo(pdmArchiveRecordsInfo.getProductId(), pdmArchiveRecordsInfo.getArchiveResult(), tempId, productType);
         return 1;
     }
 
     @Override
-    public String getArchivePersonnelName(String archivePersonnel){
+    public String getArchivePersonnelName(String archivePersonnel) {
 
         return pdmUserInfoMapper.selectUserNameByUserId(archivePersonnel);
     }
 
     @Override
-    public int updateOrthoProduct(PdmOrthoProductInfo pdmOrthoProductInfo){
+    public int updateOrthoProduct(PdmOrthoProductInfo pdmOrthoProductInfo) {
 
         return pdmOrthoProductInfoMapper.insert(pdmOrthoProductInfo);
     }
 
     @Override
-    public int updateInlayProduct(PdmInlayProductInfo pdmInlayProductInfo){
+    public int updateInlayProduct(PdmInlayProductInfo pdmInlayProductInfo) {
 
         return pdmInlayProductInfoMapper.insert(pdmInlayProductInfo);
     }
 
     @Override
-    public int updateSubdivisionProduct(PdmSubdivisionProductInfo pdmSubdivisionProductInfo){
+    public int updateSubdivisionProduct(PdmSubdivisionProductInfo pdmSubdivisionProductInfo) {
 
         return pdmSubdivisionProductInfoMapper.insert(pdmSubdivisionProductInfo);
     }
 
 
     @Override
-    public int updateAdvancedProductShpInfo(PdmAdvancedProductShpInfo pdmAdvancedProductShpInfo){
+    public int updateAdvancedProductShpInfo(PdmAdvancedProductShpInfo pdmAdvancedProductShpInfo) {
 
         return pdmAdvancedProductShpInfoMapper.insert(pdmAdvancedProductShpInfo);
-}
+    }
 
     @Override
     public String xml2jsonString(String path) throws JSONException, IOException {
-        File file= new File(path);
-        InputStream in =new FileInputStream(file);
+        File file = new File(path);
+        InputStream in = new FileInputStream(file);
         String xml = IOUtils.toString(in);
         return XML.toJSONObject(xml).toString();
+    }
+
+    @Override
+    public List<String> getSatelliteList() {
+        return pdmSatelliteInfoMapper.selectSatelliteInfo();
+    }
+
+    @Override
+    public List<String> getSensorList() {
+        return pdmSensorInfoMapper.selectSensorInfo();
     }
 
 

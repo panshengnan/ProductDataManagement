@@ -1,19 +1,14 @@
 package com.cgwx.service;
 
-import com.cgwx.data.dto.ArchivalRecordsItems;
 import com.cgwx.data.dto.SecondaryFileStructure;
 import com.cgwx.data.dto.UploadFileReturn;
 import com.cgwx.data.entity.*;
 import com.github.pagehelper.PageInfo;
 import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Document;
-
 import java.io.File;
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.util.List;
 
 /**
@@ -21,7 +16,7 @@ import java.util.List;
  */
 
 
-public interface IProductArchiveService {              //
+public interface IProductArchiveService {
 
     void updateXml(Document document, PdmThemeticProductInfo pdmThemeticProductInfo);
     void update(Document document, String fileName);
@@ -58,5 +53,7 @@ public interface IProductArchiveService {              //
     int updateSubdivisionProduct(PdmSubdivisionProductInfo pdmSubdivisionProductInfo);
     int updateAdvancedProductShpInfo(PdmAdvancedProductShpInfo pdmAdvancedProductShpInfo);
     String xml2jsonString(String path)throws JSONException, IOException;
+    List<String> getSatelliteList();
+    List<String> getSensorList();
 
 }

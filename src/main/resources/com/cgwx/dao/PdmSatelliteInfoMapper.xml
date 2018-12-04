@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cgwx.dao.PdmSatelliteInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.cgwx.data.entity.PdmSatelliteInfo" >
+    <result column="satellite_code" property="satelliteCode" jdbcType="INTEGER" />
+    <result column="satellite_description" property="satelliteDescription" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.cgwx.data.entity.PdmSatelliteInfo" >
+    insert into pdm_satellite_info (satellite_code, satellite_description
+      )
+    values (#{satelliteCode,jdbcType=INTEGER}, #{satelliteDescription,jdbcType=VARCHAR}
+      )
+  </insert>
+  <select id="selectAll" resultMap="BaseResultMap" >
+    select satellite_code, satellite_description
+    from pdm_satellite_info
+  </select>
+</mapper>
