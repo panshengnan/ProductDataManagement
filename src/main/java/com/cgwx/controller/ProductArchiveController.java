@@ -194,8 +194,34 @@ public class ProductArchiveController {
                 pdmOrthoProductInfo.setImageGeo(orthoBoundaryGeo);
                 pdmOrthoProductInfo.setOrthoProductDirectory(officialPath);
                 pdmOrthoProductInfo.setProducer(jsonObject.getString("producer"));
-                //剩下的字段可能需要从xml里面读
-
+                //剩下的字段从xml里面读
+                String xmlPath = iProductArchiveService.getXmlFilePath(officialPath);
+                String xmlJson = "";
+                try {
+                    if (xmlPath != null && !xmlPath.equals(""))
+                        xmlJson = iProductArchiveService.xml2jsonString(xmlPath);
+                     } catch (IOException ie) {
+                    System.out.println("读xml失败！");
+                }
+                JSONObject xmlJsonObject = JSONObject.fromObject(xmlJson);
+                pdmOrthoProductInfo.setSatellite(xmlJsonObject.getString("SatelliteID"));
+                pdmOrthoProductInfo.setReceiveStation(xmlJsonObject.getString("ReceiveStation"));
+                pdmOrthoProductInfo.setSensor(xmlJsonObject.getString("Sensor"));
+                pdmOrthoProductInfo.setSwingSatelliteAngle(xmlJsonObject.getString("SwingSatelliteAngle"));
+                pdmOrthoProductInfo.setCloudPercent(Float.parseFloat(xmlJsonObject.getString("CloudPercent")));
+                pdmOrthoProductInfo.setWidthInMeters(Double.parseDouble(xmlJsonObject.getString("WidthInMeters")));
+                pdmOrthoProductInfo.setHeightInMeters(Double.parseDouble(xmlJsonObject.getString("HeightInMeters")));
+                pdmOrthoProductInfo.setProductQuality(xmlJsonObject.getString("ProductQuality"));
+                pdmOrthoProductInfo.setBands(xmlJsonObject.getString("Bands"));
+                pdmOrthoProductInfo.setCenterLongitude(Double.parseDouble(xmlJsonObject.getString("CenterLongitude")));
+                pdmOrthoProductInfo.setCenterLatitude(Double.parseDouble(xmlJsonObject.getString("CenterLatitude")));
+                try {
+                    pdmOrthoProductInfo.setReceiveTime(dateFormat.parse(xmlJsonObject.getString("ReceiveTime")));
+                    pdmOrthoProductInfo.setCenterTime(dateFormat.parse(xmlJsonObject.getString("CenterTime")));
+                } catch (ParseException pe) {
+                    System.out.println(pe.getMessage());
+                }
+                //剩下的字段从xml里面读
                 iProductArchiveService.updateOrthoProduct(pdmOrthoProductInfo);
                 //开始发布tif
                 JSONObject orthoContent = new JSONObject();

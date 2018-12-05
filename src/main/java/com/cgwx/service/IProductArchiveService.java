@@ -55,5 +55,7 @@ public interface IProductArchiveService {
     String xml2jsonString(String path)throws JSONException, IOException;
     List<String> getSatelliteList();
     List<String> getSensorList();
+    String getXmlFilePath(String parentPath);
+
 
 }

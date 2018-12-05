@@ -693,5 +693,21 @@ public class IProductArchiveServiceImpl implements IProductArchiveService {
         return pdmSensorInfoMapper.selectSensorInfo();
     }
 
+    @Override
+    public String getXmlFilePath(String parentPath){
+
+        String xmlPath = "";
+        File file = new File(parentPath);
+        File[] tempList = file.listFiles();
+        for (int i = 0; i < tempList.length; i++) {
+            if (tempList[i].isFile()) {
+                String tmp = tempList[i].toString();
+                String postfix = tmp.substring(tmp.lastIndexOf('.') + 1);
+                if (postfix.equals("xml") || postfix.equals("XML"))
+                    xmlPath = tmp;
+            }
+        }
+        return xmlPath;
+    }
 
 }
