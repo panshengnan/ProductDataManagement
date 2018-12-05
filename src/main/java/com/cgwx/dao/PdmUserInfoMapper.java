@@ -15,7 +15,7 @@ public interface PdmUserInfoMapper {
 
     @Select("SELECT password\n" +
             "FROM pdm_user_info\n" +
-            "WHERE upper(user_name) = #{account}"
+            "WHERE upper(user_name) = upper(#{account})"
     )
     String selectPasswdByAccount(@Param("account") String account);
 
@@ -23,7 +23,7 @@ public interface PdmUserInfoMapper {
 
     @Select("SELECT user_id\n" +
             "FROM pdm_user_info\n" +
-            "WHERE user_name = #{account}"
+            "WHERE upper(user_name) = upper(#{account})"
     )
     String selectIdByAccount(@Param("account") String account);
 
@@ -32,12 +32,18 @@ public interface PdmUserInfoMapper {
 
     @Select("SELECT count(user_id)\n" +
             "FROM pdm_user_info\n" +
-            "WHERE upper(user_name) = #{account}"
+            "WHERE upper(user_name) = upper(#{account})"
     )
     int selectCountIdByAccount(@Param("account") String account);
 
+    @Select("SELECT count(user_id)\n" +
+            "FROM pdm_user_info\n" +
+            "WHERE upper(user_id) = upper(#{userId})"
+    )
+    int selectCountIdByUserId(@Param("userId") String userId);
+
     @Select("update pdm_user_info set password = #{passwd}\n" +
-            "WHERE upper(user_name) = #{account}"
+            "WHERE upper(user_name) = upper(#{account})"
     )
     void insertPasswd(@Param("account") String account,@Param("passwd") String passwd);
 

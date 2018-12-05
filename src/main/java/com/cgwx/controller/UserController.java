@@ -57,10 +57,11 @@ public class UserController {
     @RequestMapping(value = "/modifyPasswd")
     @CrossOrigin(methods = RequestMethod.GET)
     @ResponseBody
-    public Result modifyPasswd(@RequestParam(value = "account", required = true) String account,
-                               @RequestParam(value = "passwd", required = true) String passwd){
+    public Result modifyPasswd(@RequestParam(value = "userId", required = true) String userId,
+                               @RequestParam(value = "oldPasswd", required = true) String oldPasswd,
+                               @RequestParam(value = "newPasswd", required = true) String newPasswd){
 
-        return ResultUtil.success(userService.modifyPasswdByAccount(account,passwd));
+        return ResultUtil.success(userService.modifyPasswdByAccount(userId,oldPasswd,newPasswd));
     }
 
     @RequestMapping(value = "/getUserList")
