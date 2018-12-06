@@ -12,19 +12,15 @@ public interface PdmProductInfoMapper {
     int insert(PdmProductInfo record);
 
     List<PdmProductInfo> selectAll();
-    //
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
 
 
-        @Select({"SELECT client_name\nFROM pdm_product_info\nWHERE client_name like  '%${clientName}%' order by client_name collate \"C\" "})
+        @Select({"SELECT distinct client_name\nFROM pdm_product_info\nWHERE client_name like  '%${clientName}%' and client_name <> '' "})
         List<String> selectClientNameList(@Param("clientName") String var1);
 
-        @Select({"SELECT deliver_name\nFROM pdm_product_info\nWHERE deliver_name like  '%${deliverName}%' order by deliver_name collate \"C\" "})
+        @Select({"SELECT distinct deliver_name\nFROM pdm_product_info\nWHERE deliver_name like  '%${deliverName}%'  and deliver_name <> '' "})
         List<String> selectDeliverNameList(@Param("deliverName") String var1);
 
-        @Select({"SELECT producer\nFROM pdm_product_info\nWHERE producer like  '%${producer}%' order by producer collate \"C\" "})
+        @Select({"SELECT producer\nFROM pdm_product_info\nWHERE producer like  '%${producer}%' and producer <> '' order by producer collate \"C\" "})
         List<String> selectProducerList(@Param("producer") String var1);
 
         @Select({"SELECT product_type\n" +
